@@ -119,6 +119,7 @@ const adminStatus = document.querySelector('[data-admin-status]');
 const moderationQueue = document.querySelector('[data-moderation-queue]');
 const adminLogout = document.querySelector('[data-admin-logout]');
 let adminToken = '';
+let stickerPlacement = null;
 async function api(path, options={}) {
   const headers = { ...(options.body ? {'Content-Type':'application/json'} : {}), ...(path.startsWith('/api/admin/') && adminToken ? {Authorization:`Bearer ${adminToken}`} : {}), ...options.headers };
   let response;
@@ -154,7 +155,17 @@ function renderApproved(items) {
       card.style.left = `calc(${item.position.x * 100}% - ${item.position.x * card.offsetWidth}px)`; card.style.top = `calc(${item.position.y * 100}% - ${item.position.y * card.offsetHeight}px)`;
     }
     if (adminToken) {
-      card.classList.add('admin-draggable'); card.title = 'Перетащите стикер, чтобы изменить его положение';
+      const moveButton = document.createElement('button');
+      moveButton.type = 'button'; moveButton.className = 'sticker-move-button'; moveButton.textContent = '↗';
+      moveButton.setAttribute('aria-label', 'Перенести стикер к курсору'); moveButton.title = 'Нажмите, затем укажите место на странице';
+      moveButton.addEventListener('pointerdown', event => event.stopPropagation());
+      moveButton.addEventListener('click', event => {
+        event.stopPropagation(); stickerPlacement = { card, field, id: item.id };
+        card.classList.add('is-placement-target'); document.body.classList.add('placing-sticker');
+        if (adminStatus) adminStatus.textContent = 'Наведите курсор на нужное место и нажмите.';
+      });
+      card.append(moveButton);
+      card.classList.add('admin-draggable'); card.title = 'Перетащите стикер или нажмите ↗ для переноса к курсору';
       card.addEventListener('pointerdown', event => {
         if (event.button !== 0) return;
         event.preventDefault(); card.setPointerCapture(event.pointerId);
@@ -178,6 +189,24 @@ function renderApproved(items) {
     field.append(card);
   });
 }
+document.addEventListener('pointermove', event => {
+  if (!stickerPlacement) return;
+  const {card, field} = stickerPlacement; const bounds = field.getBoundingClientRect();
+  const x = Math.max(0, Math.min(1, (event.clientX - bounds.left - card.offsetWidth / 2) / Math.max(1, bounds.width - card.offsetWidth)));
+  const y = Math.max(0, Math.min(1, (event.clientY - bounds.top - card.offsetHeight / 2) / Math.max(1, bounds.height - card.offsetHeight)));
+  card.style.left = `calc(${x * 100}% - ${x * card.offsetWidth}px)`; card.style.top = `calc(${y * 100}% - ${y * card.offsetHeight}px)`;
+  card.dataset.position = JSON.stringify({x,y});
+});
+document.addEventListener('click', async event => {
+  if (!stickerPlacement || event.target.closest('.sticker-move-button')) return;
+  const placement = stickerPlacement; stickerPlacement = null;
+  placement.card.classList.remove('is-placement-target'); document.body.classList.remove('placing-sticker');
+  if (!placement.card.dataset.position) return;
+  try {
+    await api(`/api/admin/stickers/${encodeURIComponent(placement.id)}/position`, {method:'PATCH', body:placement.card.dataset.position});
+    delete placement.card.dataset.position; if (adminStatus) adminStatus.textContent = 'Положение стикера сохранено.';
+  } catch (error) { if (adminStatus) adminStatus.textContent = error.message; loadApproved(); }
+}, true);
 async function loadApproved() {
   try { renderApproved(await api('/api/stickers')); }
   catch {
