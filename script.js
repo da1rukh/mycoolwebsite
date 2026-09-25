@@ -117,9 +117,12 @@ const stickerFields = [...document.querySelectorAll('[data-sticker-field]')];
 const adminForm = document.querySelector('[data-admin-login]');
 const adminStatus = document.querySelector('[data-admin-status]');
 const moderationQueue = document.querySelector('[data-moderation-queue]');
+const approvedStickerTools = document.querySelector('[data-approved-sticker-tools]');
 const adminLogout = document.querySelector('[data-admin-logout]');
 let adminToken = '';
 let stickerPlacement = null;
+let lastPointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+document.addEventListener('pointermove', event => { lastPointer = { x: event.clientX, y: event.clientY }; }, { passive: true });
 async function api(path, options={}) {
   const headers = { ...(options.body ? {'Content-Type':'application/json'} : {}), ...(path.startsWith('/api/admin/') && adminToken ? {Authorization:`Bearer ${adminToken}`} : {}), ...options.headers };
   let response;
@@ -130,6 +133,27 @@ async function api(path, options={}) {
   return result;
 }
 function renderApproved(items) {
+  if (approvedStickerTools) {
+    approvedStickerTools.replaceChildren();
+    if (adminToken && items.length) items.forEach(item => {
+      const row = document.createElement('div'); row.className = 'approved-sticker-tool';
+      const label = document.createElement('span'); label.textContent = item.text;
+      const button = document.createElement('button'); button.type = 'button'; button.className = 'button button-quiet'; button.textContent = 'Курсор';
+      button.addEventListener('click', async () => {
+        const card = [...document.querySelectorAll('[data-sticker-id]')].find(node => node.dataset.stickerId === item.id);
+        const field = card?.parentElement;
+        if (!card || !field) { if (adminStatus) adminStatus.textContent = 'Не удалось найти стикер на странице.'; return; }
+        const bounds = field.getBoundingClientRect();
+        const x = Math.max(0, Math.min(1, (lastPointer.x - bounds.left - card.offsetWidth / 2) / Math.max(1, bounds.width - card.offsetWidth)));
+        const y = Math.max(0, Math.min(1, (lastPointer.y - bounds.top - card.offsetHeight / 2) / Math.max(1, bounds.height - card.offsetHeight)));
+        const position = {x,y};
+        card.style.left = `calc(${x * 100}% - ${x * card.offsetWidth}px)`; card.style.top = `calc(${y * 100}% - ${y * card.offsetHeight}px)`;
+        try { await api(`/api/admin/stickers/${encodeURIComponent(item.id)}/position`, {method:'PATCH', body:JSON.stringify(position)}); if (adminStatus) adminStatus.textContent = 'Стикер перенесён к курсору.'; }
+        catch (error) { if (adminStatus) adminStatus.textContent = error.message; loadApproved(); }
+      });
+      row.append(label, button); approvedStickerTools.append(row);
+    });
+  }
   stickerFields.forEach(field => field.replaceChildren());
   if (!stickerFields.length) return;
   if (!items.length) {
@@ -142,6 +166,7 @@ function renderApproved(items) {
     const field = stickerFields[index % stickerFields.length];
     const card = document.createElement('article');
     card.className = `paper-sticker wall-sticker ${styles[index % styles.length]}`;
+    card.dataset.stickerId = item.id;
     if (!item.position) { card.dataset.x = String((index % 2) * 0.58); card.style.left = `${(index % 2) * 58}%`; card.style.top = `${Math.floor(index / 2) * 155}px`; }
     const flower = document.createElement('span');
     flower.setAttribute('aria-hidden', 'true');
@@ -210,6 +235,7 @@ document.addEventListener('click', async event => {
 async function loadApproved() {
   try { renderApproved(await api('/api/stickers')); }
   catch {
+    approvedStickerTools?.replaceChildren();
     stickerFields.forEach(field => {
       field.replaceChildren();
       field.hidden = true;
@@ -241,7 +267,7 @@ adminForm?.addEventListener('submit', async event => {
   try { await loadQueue(); adminStatus.textContent = 'Вход выполнен. Новые стикеры ждут решения.'; adminForm.querySelector('input').value = ''; adminLogout.hidden = false; renderTracks(); await loadApproved(); }
   catch { adminToken = ''; adminStatus.textContent = 'Пароль неверный или сервер недоступен.'; renderTracks(); }
 });
-adminLogout?.addEventListener('click',()=>{adminToken='';moderationQueue.replaceChildren();loadApproved();adminStatus.textContent='Вы вышли из панели.';adminLogout.hidden=true;renderTracks();});
+adminLogout?.addEventListener('click',()=>{adminToken='';moderationQueue.replaceChildren();approvedStickerTools?.replaceChildren();loadApproved();adminStatus.textContent='Вы вышли из панели.';adminLogout.hidden=true;renderTracks();});
 loadApproved();
 const parallaxItems = [...document.querySelectorAll('[data-parallax]')];
 const chapters = [...document.querySelectorAll('.garden-chapter')];
