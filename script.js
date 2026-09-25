@@ -108,12 +108,6 @@ document.querySelector('[data-water]')?.addEventListener('click', () => {
   waterTimer = window.setTimeout(() => document.body.classList.remove('watered'), 1500);
 });
 const themeButton = document.querySelector('.theme-button');
-document.querySelector('.owner-button')?.addEventListener('click', () => {
-  document.querySelector('.admin-panel')?.scrollIntoView({behavior:'smooth', block:'center'});
-  const panel = document.querySelector('.admin-panel'); if (panel) panel.open = true;
-  if (adminToken) moderationQueue?.scrollIntoView({behavior:'smooth', block:'center'});
-  else window.setTimeout(() => document.querySelector('#admin-password')?.focus(), 350);
-});
 themeButton?.addEventListener('click', () => {
   const enabled = document.body.classList.toggle('dark'); themeButton.setAttribute('aria-pressed', String(enabled)); themeButton.textContent = enabled ? '☾' : '☼';
 });

@@ -17,8 +17,21 @@
   <header class="site-header">
     <a class="wordmark" href="#top" aria-label="На главную">flower<span>•</span>talker</a>
     <nav aria-label="Основная навигация"><a href="#about">обо мне</a><a href="#hobbies">увлечения</a><a href="#notes">заметки</a><a href="#contact">стикеры</a></nav>
-    <button class="theme-button" type="button" aria-label="Переключить тему" aria-pressed="false">☼</button>
-    <button class="owner-button" type="button" aria-label="Открыть модерацию владельца" title="Модерация владельца"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8 20 6v5.5c0 5-3.4 8.4-8 10.7-4.6-2.3-8-5.7-8-10.7V6l8-3.2Z"/><path d="m8.7 12 2.2 2.2 4.6-4.7"/></svg></button>
+    <div class="header-tools"><button class="theme-button" type="button" aria-label="Переключить тему" aria-pressed="false">☼</button>
+    <details class="admin-panel header-admin"><summary class="owner-button" aria-label="Открыть модерацию владельца" title="Модерация владельца"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8 20 6v5.5c0 5-3.4 8.4-8 10.7-4.6-2.3-8-5.7-8-10.7V6l8-3.2Z"/><path d="m8.7 12 2.2 2.2 4.6-4.7"/></svg></summary>
+    <details class="admin-panel">
+      <summary>Модерация владельца</summary>
+      <form class="admin-login" data-admin-login>
+        <label for="admin-password">Пароль администратора</label>
+        <input id="admin-password" type="password" autocomplete="current-password" required>
+        <button class="button button-quiet" type="submit">войти</button>
+        <button class="button button-quiet" type="button" data-admin-logout hidden>выйти</button>
+        <p class="admin-status" data-admin-status role="status" aria-live="polite"></p>
+      </form>
+      <div class="moderation-queue" data-moderation-queue></div>
+      <div class="approved-sticker-tools" data-approved-sticker-tools aria-label="Опубликованные стикеры"></div>
+    </details>
+    </details></div>
   </header>
   <main id="top">
     <section class="hero section-shell garden-chapter" data-garden-state="dawn" data-story-state="seed">
@@ -53,18 +66,7 @@
           <button class="button button-primary" type="submit">отправить на проверку <span aria-hidden="true">↗</span></button>
           <p class="sticker-status" data-sticker-status role="status" aria-live="polite"></p>
         </form>
-        <details class="admin-panel">
-          <summary>Модерация владельца</summary>
-          <form class="admin-login" data-admin-login>
-            <label for="admin-password">Пароль администратора</label>
-            <input id="admin-password" type="password" autocomplete="current-password" required>
-            <button class="button button-quiet" type="submit">войти</button>
-            <button class="button button-quiet" type="button" data-admin-logout hidden>выйти</button>
-            <p class="admin-status" data-admin-status role="status" aria-live="polite"></p>
-          </form>
-          <div class="moderation-queue" data-moderation-queue></div>
-          <div class="approved-sticker-tools" data-approved-sticker-tools aria-label="Опубликованные стикеры"></div>
-        </details>
+
       </div>
     </section>
   </main>
