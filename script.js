@@ -50,6 +50,9 @@ const letterHobby = document.querySelector('[data-letter-hobby]');
 const letterNote = document.querySelector('[data-letter-note]');
 const letterStatus = document.querySelector('[data-letter-status]');
 const seedEcho = document.querySelector('[data-seed-echo]');
+const sealSeed = document.querySelector('[data-seal-seed]');
+const sealHobby = document.querySelector('[data-seal-hobby]');
+const flowerSeal = document.querySelector('.flower-seal');
 const seedLabels = { light: 'свет', quiet: 'тишина', spark: 'искра' };
 const hobbyLabels = { музыка: 'музыку', рисование: 'рисование', игры: 'игры', книги: 'книги' };
 const noteLabels = {
@@ -68,6 +71,12 @@ function renderWalk() {
   if (letterNote) letterNote.textContent = noteLabels[walk.note] || 'Сделать что-нибудь просто потому, что хочется.';
   if (seedEcho) seedEcho.textContent = walk.seed ? `Ты взял с собой ${seedLabels[walk.seed]}. Оно уже пустило корни.` : 'Любая история начинается с того, что хочется заметить.';
   if (seedEcho) seedEcho.dataset.seedTheme = walk.seed || 'default';
+  if (sealSeed) sealSeed.textContent = seedLabels[walk.seed] || 'любопытство';
+  if (sealHobby) sealHobby.textContent = hobbyLabels[walk.hobby] || 'открытия';
+  if (flowerSeal) {
+    flowerSeal.dataset.seed = walk.seed || 'default';
+    flowerSeal.setAttribute('aria-label', `Цветочная печать: ${seedLabels[walk.seed] || 'любопытство'}, ${hobbyLabels[walk.hobby] || 'маленькие открытия'}, ${noteLabels[walk.note] || noteLabels['note-3']}`);
+  }
   saveWalk();
 }
 seeds.forEach(button => button.addEventListener('click', () => {
@@ -138,9 +147,9 @@ const vine = document.querySelector('.garden-vine span');
 const nativeScrollAnimation = typeof CSS !== 'undefined' && CSS.supports('animation-timeline: scroll()');
 const storyStage = document.querySelector('.story-stage');
 const storyPlant = document.querySelector('.story-plant');
+storyPlant?.querySelectorAll('path').forEach(path => path.setAttribute('pathLength', '1'));
 const storyLabel = document.querySelector('.story-state-label');
 const storyPhases = ['семечко', 'корни', 'стебель', 'цветение', 'сад'];
-storyPlant?.querySelectorAll('path').forEach(path => path.setAttribute('pathLength', '1'));
 const storyStateNames = ['seed', 'roots', 'stem', 'bloom', 'garden'];
 function updateStory(progress) {
   if (!storyStage || !storyPlant) return;
@@ -156,6 +165,7 @@ function updateStory(progress) {
   storyStage.style.setProperty('--branches', branches);
   storyStage.style.setProperty('--bloom', bloom);
   storyStage.style.setProperty('--seed', Math.max(.28, 1 - growth * .78));
+  storyStage.style.setProperty('--thread-progress', progress);
   if (storyLabel) storyLabel.textContent = storyPhases[phaseIndex];
   storyPlant.style.setProperty('--phase-progress', phaseProgress);
 }
