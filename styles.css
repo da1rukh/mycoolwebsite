@@ -195,3 +195,8 @@ body.dark .button-primary,body.dark .toast{color:#20271e;transition:none}
 .guest-sticker-field{display:block;min-height:390px;position:relative;overflow:visible}.guest-sticker-field .wall-sticker[style*=left]{position:absolute;z-index:5;width:min(100%,220px);margin:0;transform:rotate(-2deg)}.guest-sticker-field .admin-draggable{cursor:grab;touch-action:none;user-select:none}.guest-sticker-field .admin-draggable:active{cursor:grabbing}
 
 @media(max-width:760px){.guest-sticker-field{min-height:250px;display:block}.guest-sticker-field .wall-sticker[style*=left]{width:min(48%,220px)}}
+
+/* Admin sticker layout spans the whole chapter, not the narrow display rail. */
+.guest-sticker-field{position:absolute!important;inset:0!important;top:0!important;right:0!important;bottom:0!important;left:0!important;width:auto!important;height:100%!important;min-height:0!important;display:block!important;margin:0!important;padding:0!important;pointer-events:none!important;z-index:6!important}
+.guest-sticker-field .wall-sticker{position:absolute!important;width:min(220px,24vw)!important;max-width:100%;margin:0!important;pointer-events:auto!important}
+@media(max-width:760px){.guest-sticker-field{position:absolute!important;inset:0!important;width:auto!important;height:100%!important;min-height:0!important}.guest-sticker-field .wall-sticker{width:min(180px,44vw)!important;margin:0!important}}
