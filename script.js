@@ -30,8 +30,76 @@ document.querySelectorAll('[data-hobby]').forEach(button => {
   button.addEventListener('click', () => {
     document.querySelectorAll('[data-hobby]').forEach(item => item.setAttribute('aria-pressed', 'false'));
     button.setAttribute('aria-pressed', 'true');
-    detail.textContent = hobbyNotes[button.dataset.hobby];
+    if (detail) detail.textContent = hobbyNotes[button.dataset.hobby];
+    walk.hobby = button.dataset.hobby;
+    renderWalk();
+    if (letterStatus) letterStatus.textContent = `В записке появилось увлечение: ${hobbyLabels[walk.hobby]}.`;
   });
+});
+
+const walkStorageKey = 'flowertalker-garden-walk';
+const walk = { seed: '', hobby: '', note: '' };
+try {
+  const savedWalk = JSON.parse(localStorage.getItem(walkStorageKey) || '{}');
+  if (savedWalk && typeof savedWalk === 'object') Object.assign(walk, savedWalk);
+} catch { /* Storage may be disabled; the walk still works for this visit. */ }
+const seeds = [...document.querySelectorAll('[data-seed]')];
+const keepsakes = [...document.querySelectorAll('[data-keepsake]')];
+const letterSeed = document.querySelector('[data-letter-seed]');
+const letterHobby = document.querySelector('[data-letter-hobby]');
+const letterNote = document.querySelector('[data-letter-note]');
+const letterStatus = document.querySelector('[data-letter-status]');
+const seedEcho = document.querySelector('[data-seed-echo]');
+const seedLabels = { light: 'свет', quiet: 'тишина', spark: 'искра' };
+const hobbyLabels = { музыка: 'музыку', рисование: 'рисование', игры: 'игры', книги: 'книги' };
+const noteLabels = {
+  'note-1': 'Красивые идеи редко приходят по расписанию.',
+  'note-2': 'Запах мокрого асфальта после первого дождя.',
+  'note-3': 'Сделать что-нибудь просто потому, что хочется.'
+};
+function saveWalk() {
+  try { localStorage.setItem(walkStorageKey, JSON.stringify(walk)); } catch { /* Optional persistence. */ }
+}
+function renderWalk() {
+  seeds.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.seed === walk.seed)));
+  keepsakes.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.keepsake === walk.note)));
+  if (letterSeed) letterSeed.textContent = seedLabels[walk.seed] || 'любопытство';
+  if (letterHobby) letterHobby.textContent = hobbyLabels[walk.hobby] || 'маленькие открытия';
+  if (letterNote) letterNote.textContent = noteLabels[walk.note] || 'Сделать что-нибудь просто потому, что хочется.';
+  if (seedEcho) seedEcho.textContent = walk.seed ? `Ты взял с собой ${seedLabels[walk.seed]}. Оно уже пустило корни.` : 'Любая история начинается с того, что хочется заметить.';
+  if (seedEcho) seedEcho.dataset.seedTheme = walk.seed || 'default';
+  saveWalk();
+}
+seeds.forEach(button => button.addEventListener('click', () => {
+  walk.seed = button.dataset.seed;
+  renderWalk();
+  if (letterStatus) letterStatus.textContent = `Взял с собой: ${seedLabels[walk.seed]}.`;
+}));
+keepsakes.forEach(button => button.addEventListener('click', () => {
+  walk.note = button.dataset.keepsake;
+  renderWalk();
+  if (letterStatus) letterStatus.textContent = 'Эта мысль теперь в твоей записке.';
+}));
+renderWalk();
+const copyLetterButton = document.querySelector('[data-copy-letter]');
+copyLetterButton?.addEventListener('click', async () => {
+  const text = `Я взял с собой ${seedLabels[walk.seed] || 'любопытство'}, нашёл ${hobbyLabels[walk.hobby] || 'маленькие открытия'} и запомнил: ${noteLabels[walk.note] || noteLabels['note-3']}`;
+  try {
+    if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+    await navigator.clipboard.writeText(text);
+    if (letterStatus) letterStatus.textContent = 'Записка скопирована. Неси её дальше.';
+  } catch {
+    if (letterStatus) letterStatus.textContent = `Выдели и скопируй записку: ${text}`;
+  }
+});
+document.querySelector('[data-reset-walk]')?.addEventListener('click', () => {
+  walk.seed = '';
+  walk.hobby = '';
+  walk.note = '';
+  document.querySelectorAll('[data-hobby]').forEach(button => button.setAttribute('aria-pressed', 'false'));
+  if (detail) detail.textContent = 'выбери растение, чтобы раскрыть заметку';
+  if (letterStatus) letterStatus.textContent = 'Началась новая прогулка. Сад снова ждёт.';
+  renderWalk();
 });
 
 const toast = document.querySelector('.toast');
