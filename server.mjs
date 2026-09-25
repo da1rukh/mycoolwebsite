@@ -142,7 +142,7 @@ const server = createServer(async (req, res) => {
     if (path === '/api/stickers' && req.method === 'GET') {
       const items = await readItems();
       return send(res, 200, items.filter(item => item.status === 'approved')
-        .map(({ id, text, createdAt }) => ({ id, text, createdAt })));
+        .map(({ id, text, createdAt, position }) => ({ id, text, createdAt, position })));
     }
     if (path === '/api/stickers' && req.method === 'POST') {
       if (rateLimited(submissions, ip, 4, 60_000)) return send(res, 429, { error: 'Попробуй отправить записку позже.' });
@@ -153,6 +153,20 @@ const server = createServer(async (req, res) => {
       if (!text) return send(res, 400, { error: 'Напиши текст стикера.' });
       await mutate(items => items.push({ id: randomUUID(), text, status: 'pending', createdAt: new Date().toISOString() }));
       return send(res, 201, { message: 'Записка отправлена на модерацию.' });
+    }
+    const move = path.match(/^\/api\/admin\/stickers\/([\w-]+)\/position$/);
+    if (move && req.method === 'PATCH') {
+      if (!authorized(req)) return send(res, 401, { error: 'Unauthorized' }, { 'WWW-Authenticate': 'Bearer' });
+      if (req.headers['content-type']?.split(';')[0].trim().toLowerCase() !== 'application/json') return send(res, 415, { error: 'Ожидается JSON.' });
+      const data = await body(req);
+      if (!Number.isFinite(data?.x) || !Number.isFinite(data?.y) || data.x < 0 || data.x > 1 || data.y < 0 || data.y > 1) return send(res, 400, { error: 'Некорректная позиция.' });
+      const found = await mutate(items => {
+        const item = items.find(candidate => candidate.id === move[1] && candidate.status === 'approved');
+        if (!item) return false;
+        item.position = { x: data.x, y: data.y };
+        return true;
+      });
+      return found ? send(res, 200, { ok: true }) : send(res, 404, { error: 'Стикер не найден.' });
     }
     const action = path.match(/^\/api\/admin\/stickers\/([\w-]+)\/(approve|reject)$/);
     if ((path === '/api/admin/stickers' && req.method === 'GET') || (action && req.method === 'POST')) {

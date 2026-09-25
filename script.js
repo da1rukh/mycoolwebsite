@@ -149,6 +149,29 @@ function renderApproved(items) {
     const date = document.createElement('small');
     date.textContent = new Date(item.createdAt).toLocaleDateString('ru-RU');
     card.append(flower, text, date);
+    if (item.position && Number.isFinite(item.position.x) && Number.isFinite(item.position.y)) {
+      card.style.left = `${item.position.x * 100}%`; card.style.top = `${item.position.y * 100}%`;
+    }
+    if (adminToken) {
+      card.classList.add('admin-draggable'); card.title = 'Перетащите стикер, чтобы изменить его положение';
+      card.addEventListener('pointerdown', event => {
+        if (event.button !== 0) return;
+        event.preventDefault(); card.setPointerCapture(event.pointerId);
+        const move = e => {
+          const bounds = field.getBoundingClientRect();
+          const x = Math.max(0, Math.min(1, (e.clientX - bounds.left - card.offsetWidth / 2) / Math.max(1, bounds.width - card.offsetWidth)));
+          const y = Math.max(0, Math.min(1, (e.clientY - bounds.top - card.offsetHeight / 2) / Math.max(1, bounds.height - card.offsetHeight)));
+          card.style.left = `${x * 100}%`; card.style.top = `${y * 100}%`; card.dataset.position = JSON.stringify({x,y});
+        };
+        const finish = async () => {
+          card.removeEventListener('pointermove', move); card.removeEventListener('pointerup', finish); card.removeEventListener('pointercancel', finish);
+          if (!card.dataset.position) return;
+          try { await api(`/api/admin/stickers/${encodeURIComponent(item.id)}/position`, {method:'PATCH', body:card.dataset.position}); delete card.dataset.position; if (adminStatus) adminStatus.textContent = 'Положение стикера сохранено.'; }
+          catch (error) { if (adminStatus) adminStatus.textContent = error.message; loadApproved(); }
+        };
+        card.addEventListener('pointermove', move); card.addEventListener('pointerup', finish); card.addEventListener('pointercancel', finish);
+      });
+    }
     field.append(card);
   });
 }
@@ -183,10 +206,10 @@ async function loadQueue() {
 }
 adminForm?.addEventListener('submit', async event => {
   event.preventDefault(); adminToken = adminForm.querySelector('input').value;
-  try { await loadQueue(); adminStatus.textContent = 'Вход выполнен. Новые стикеры ждут решения.'; adminForm.querySelector('input').value = ''; adminLogout.hidden = false; renderTracks(); }
+  try { await loadQueue(); adminStatus.textContent = 'Вход выполнен. Новые стикеры ждут решения.'; adminForm.querySelector('input').value = ''; adminLogout.hidden = false; renderTracks(); await loadApproved(); }
   catch { adminToken = ''; adminStatus.textContent = 'Пароль неверный или сервер недоступен.'; renderTracks(); }
 });
-adminLogout?.addEventListener('click',()=>{adminToken='';moderationQueue.replaceChildren();adminStatus.textContent='Вы вышли из панели.';adminLogout.hidden=true;renderTracks();});
+adminLogout?.addEventListener('click',()=>{adminToken='';moderationQueue.replaceChildren();loadApproved();adminStatus.textContent='Вы вышли из панели.';adminLogout.hidden=true;renderTracks();});
 loadApproved();
 const parallaxItems = [...document.querySelectorAll('[data-parallax]')];
 const chapters = [...document.querySelectorAll('.garden-chapter')];

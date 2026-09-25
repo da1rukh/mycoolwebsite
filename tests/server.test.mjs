@@ -47,7 +47,12 @@ test('stickers API, persistence, authorization, limits and static isolation', as
     assert.equal(queued[0].status, 'pending');
     assert.equal((await request(`/api/admin/stickers/${queued[0].id}/approve`, { method: 'POST' })).status, 401);
     assert.equal((await request(`/api/admin/stickers/${queued[0].id}/approve`, { method: 'POST', headers: auth })).status, 200);
-    assert.equal((await (await request('/api/stickers')).json())[0].text, 'First');
+    const approved = (await (await request('/api/stickers')).json())[0];
+    assert.equal((await request(`/api/admin/stickers/${approved.id}/position`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ x: 0.4, y: 0.7 }) })).status, 401);
+    const moved = await request(`/api/admin/stickers/${approved.id}/position`, { method: 'PATCH', headers: { ...auth, 'Content-Type': 'application/json' }, body: JSON.stringify({ x: 0.4, y: 0.7 }) });
+    assert.equal(moved.status, 200);
+    assert.deepEqual((await (await request('/api/stickers')).json())[0].position, { x: 0.4, y: 0.7 });
+    assert.equal((await request(`/api/admin/stickers/${approved.id}/position`, { method: 'PATCH', headers: { ...auth, 'Content-Type': 'application/json' }, body: JSON.stringify({ x: 2, y: -1 }) })).status, 400);
     assert.equal((await post('Second')).status, 201);
     const second = (await (await request('/api/admin/stickers', { headers: auth })).json())[0];
     assert.equal((await request(`/api/admin/stickers/${second.id}/reject`, { method: 'POST', headers: auth })).status, 200);
