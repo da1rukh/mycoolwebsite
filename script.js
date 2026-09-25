@@ -55,9 +55,9 @@ async function renderTracks() {
         const flower = document.createElement('span'); flower.className = 'flower-vinyl'; flower.textContent = '✿'; flower.setAttribute('aria-hidden', 'true');
         const formatTime = value => { if (!Number.isFinite(value)) return '0:00'; const seconds = Math.floor(value); return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`; };
         play.addEventListener('click', async () => { if (player.paused) { document.querySelectorAll('.audio-track audio').forEach(other => { if (other !== player) other.pause(); }); try { await player.play(); } catch {} } else player.pause(); });
-        player.addEventListener('play', () => { play.textContent = 'Ⅱ'; play.setAttribute('aria-label', `Приостановить ${track.name}`); row.classList.add('is-playing'); });
-        player.addEventListener('pause', () => { play.textContent = '▶'; play.setAttribute('aria-label', `Воспроизвести ${track.name}`); row.classList.remove('is-playing'); });
-        player.addEventListener('ended', () => { player.currentTime = 0; seek.value = '0'; });
+        player.addEventListener('play', () => { document.body.classList.add('music-growing'); play.textContent = 'Ⅱ'; play.setAttribute('aria-label', `Приостановить ${track.name}`); row.classList.add('is-playing'); });
+        player.addEventListener('pause', () => { if (![...document.querySelectorAll('.audio-track audio')].some(item => item !== player && !item.paused)) document.body.classList.remove('music-growing'); play.textContent = '▶'; play.setAttribute('aria-label', `Воспроизвести ${track.name}`); row.classList.remove('is-playing'); });
+        player.addEventListener('ended', () => { if (![...document.querySelectorAll('.audio-track audio')].some(item => item !== player && !item.paused)) document.body.classList.remove('music-growing'); player.currentTime = 0; seek.value = '0'; });
         player.addEventListener('timeupdate', () => { clock.textContent = `${formatTime(player.currentTime)} / ${formatTime(player.duration)}`; seek.value = String(player.duration ? Math.round(player.currentTime / player.duration * 1000) : 0); });
         player.addEventListener('loadedmetadata', () => { clock.textContent = `0:00 / ${formatTime(player.duration)}`; });
         seek.addEventListener('input', () => { if (player.duration) player.currentTime = Number(seek.value) / 1000 * player.duration; });
@@ -101,12 +101,73 @@ function showToast(message) {
   toast.textContent = message; toast.classList.add('show'); window.clearTimeout(toastTimer);
   toastTimer = window.setTimeout(() => toast.classList.remove('show'), 2400);
 }
-let waterTimer;
-document.querySelector('[data-water]')?.addEventListener('click', () => {
-  document.body.classList.remove('watered'); void document.body.offsetWidth; document.body.classList.add('watered');
-  showToast('Сад полит. Цветок расправил лепестки.'); window.clearTimeout(waterTimer);
-  waterTimer = window.setTimeout(() => document.body.classList.remove('watered'), 1500);
+// Garden trail: subtle pollen follows the pointer; a double tap sprouts a flower.
+const trailLayer = document.querySelector('[data-garden-trail]');
+let lastPollen = 0;
+function pollenAt(x, y) {
+  if (!trailLayer || reducedMotion || Date.now() - lastPollen < 55) return;
+  lastPollen = Date.now();
+  const mote = document.createElement('i'); mote.className = 'pollen-mote';
+  mote.style.left = `${x}px`; mote.style.top = `${y}px`;
+  mote.style.setProperty('--drift', `${Math.round(Math.random() * 32 - 16)}px`);
+  trailLayer.append(mote); mote.addEventListener('animationend', () => mote.remove(), {once:true});
+}
+document.addEventListener('pointermove', event => pollenAt(event.clientX, event.clientY), {passive:true});
+document.addEventListener('pointerdown', event => { if (event.pointerType !== 'mouse') pollenAt(event.clientX, event.clientY); }, {passive:true});
+document.addEventListener('dblclick', event => {
+  if (reducedMotion || event.target.closest('button,a,input,textarea,select,summary,form,[data-sticker-field],.header-tools')) return;
+  const sprout = document.createElement('span'); sprout.className = `sprout sprout-${1 + Math.floor(Math.random()*4)}`;
+  sprout.textContent = ['✿','✾','❀','✽'][Math.floor(Math.random()*4)];
+  sprout.style.left = `${event.clientX}px`; sprout.style.top = `${event.clientY}px`;
+  trailLayer?.append(sprout); sprout.addEventListener('animationend', () => sprout.remove(), {once:true});
+  if (navigator.vibrate) navigator.vibrate(12);
 });
+
+// Moscow forecast via Open-Meteo: public endpoint, no API key.
+const weatherToggle = document.querySelector('[data-weather-toggle]');
+const weatherPopover = document.querySelector('[data-weather-popover]');
+const weatherSummary = document.querySelector('[data-weather-summary]');
+const weatherTemp = document.querySelector('[data-weather-temp]');
+const weatherIcon = document.querySelector('[data-weather-icon]');
+const weatherLabels = {sun:['☀','Солнечно'],rain:['🌧','Тёплый дождь'],night:['☾','Ночной сад']};
+function setGardenWeather(mode) {
+  document.body.dataset.weather = mode;
+  if (weatherIcon && weatherLabels[mode]) weatherIcon.textContent = weatherLabels[mode][0];
+  document.querySelectorAll('[data-weather-mode]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.weatherMode === mode)));
+}
+weatherToggle?.addEventListener('click', () => {
+  const open = weatherPopover.hidden; weatherPopover.hidden = !open;
+  weatherToggle.setAttribute('aria-expanded', String(open));
+});
+document.querySelectorAll('[data-weather-mode]').forEach(button => button.addEventListener('click', () => setGardenWeather(button.dataset.weatherMode)));
+document.addEventListener('click', event => { if (!event.target.closest('.weather-widget') && weatherPopover && !weatherPopover.hidden) { weatherPopover.hidden = true; weatherToggle?.setAttribute('aria-expanded','false'); } });
+(async () => {
+  try {
+    const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=55.7558&longitude=37.6173&current=temperature_2m,precipitation,weather_code&timezone=Europe%2FMoscow', {cache:'no-store'});
+    if (!response.ok) throw new Error('weather unavailable');
+    const data = await response.json(), current = data.current, code = current.weather_code;
+    const rainy = current.precipitation > 0 || [51,53,55,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99].includes(code);
+    if (weatherTemp) weatherTemp.textContent = `${Math.round(current.temperature_2m)}°`;
+    if (weatherSummary) weatherSummary.textContent = `Москва · ${Math.round(current.temperature_2m)}° · ${rainy ? 'осадки или облачность' : 'без осадков'}`;
+    if (weatherLabels.sun) weatherLabels.sun[1] = rainy ? 'Пасмурно' : 'Ясно';
+    const hour = Number(new Intl.DateTimeFormat('ru-RU',{timeZone:'Europe/Moscow',hour:'2-digit',hourCycle:'h23'}).format(new Date()));
+    setGardenWeather(hour >= 21 || hour < 6 ? 'night' : rainy ? 'rain' : 'sun');
+  } catch { if (weatherSummary) weatherSummary.textContent = 'Москва · погода временно недоступна'; setGardenWeather('sun'); }
+})();
+const ambientToggle = document.querySelector('[data-ambient-toggle]');
+let ambientContext;
+ambientToggle?.addEventListener('change', () => {
+  if (!ambientToggle.checked) { ambientContext?.close(); ambientContext = null; return; }
+  try {
+    ambientContext = new (window.AudioContext || window.webkitAudioContext)();
+    const buffer = ambientContext.createBuffer(1, ambientContext.sampleRate * 2, ambientContext.sampleRate), channel = buffer.getChannelData(0);
+    for (let i=0;i<channel.length;i++) channel[i] = (Math.random()*2-1) * .18;
+    const source = ambientContext.createBufferSource(), filter = ambientContext.createBiquadFilter(), gain = ambientContext.createGain();
+    source.buffer = buffer; source.loop = true; filter.type = 'lowpass'; filter.frequency.value = 420; gain.gain.value = .012;
+    source.connect(filter).connect(gain).connect(ambientContext.destination); source.start();
+  } catch { ambientToggle.checked = false; }
+});
+
 const themeButton = document.querySelector('.theme-button');
 themeButton?.addEventListener('click', () => {
   const enabled = document.body.classList.toggle('dark'); themeButton.setAttribute('aria-pressed', String(enabled)); themeButton.textContent = enabled ? '☾' : '☼';
