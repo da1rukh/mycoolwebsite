@@ -78,16 +78,45 @@ body.dark .button-primary,body.dark .toast{color:#20271e;transition:none}
 .paper-sticker{position:absolute;z-index:2;width:142px;min-height:116px;padding:19px 14px 12px;background:#f1e5bd;color:#51452d;font-family:'Caveat',cursive;font-size:21px;line-height:1.05;box-shadow:3px 7px 14px rgba(76,61,29,.15);border:1px solid rgba(153,124,62,.2)}.paper-sticker>span{position:absolute;right:10px;top:6px;color:#bd8e23;font-size:16px}.hero-sticker{right:3%;bottom:9%;transform:rotate(7deg)}.about-sticker{right:1%;top:18%;transform:rotate(-6deg)}.hobby-sticker{right:1%;bottom:10%;transform:rotate(5deg)}.sticker-wall{display:flex;justify-content:center;align-items:center;gap:clamp(16px,4vw,52px);padding:28px 0 34px}.wall-sticker{position:relative;flex:0 1 230px;width:230px;min-height:184px;padding:29px 22px 18px}.wall-sticker p{font-size:27px;margin:12px 0}.wall-sticker small{font-family:'DM Sans',sans-serif;font-size:10px;color:#796b4d}.wall-one{transform:rotate(-4deg);background:#f2dfd4}.wall-two{transform:rotate(3deg);background:#f1e6bd}.wall-three{transform:rotate(-2deg);background:#e7e5cf}@media(max-width:760px){.paper-sticker{width:112px;min-height:92px;padding:16px 10px 9px;font-size:17px}.hero-sticker{right:0;bottom:0}.about-sticker{right:0;top:auto;bottom:4%}.hobby-sticker{right:0;bottom:4%}.sticker-wall{flex-wrap:wrap;gap:14px;padding-inline:8px}.wall-sticker{flex:1 1 135px;width:auto;min-height:142px;padding:22px 14px 13px}.wall-sticker p{font-size:22px}}
 .sticker-submit,.admin-panel{max-width:620px;margin:30px auto 0}.sticker-submit{display:grid;gap:10px;padding:24px;background:#f2e8ca;color:#443a29;box-shadow:0 8px 20px rgba(75,57,22,.1);transform:rotate(-.5deg)}.sticker-submit label,.admin-login label{font-size:14px;font-weight:700}.sticker-submit textarea,.admin-login input{width:100%;padding:12px;border:1px solid #d8cba8;background:rgba(255,255,255,.55);color:#352f24;font:inherit;resize:vertical}.sticker-submit .button{justify-self:start}.sticker-status,.admin-status{min-height:22px;margin:0;font-size:13px;color:var(--green)}.admin-panel{padding:14px 18px;border:1px solid var(--line);background:color-mix(in srgb,var(--gold-pale) 20%,transparent)}.admin-panel summary{cursor:pointer;color:var(--muted);font-size:13px}.admin-login{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:15px}.admin-login label{width:100%}.admin-login input{flex:1 1 190px}.admin-login .button,.moderation-item .button{min-height:42px}.moderation-queue{display:grid;gap:12px;margin-top:16px}.moderation-item{display:flex;align-items:center;flex-wrap:wrap;gap:9px;padding:14px;background:var(--paper);border:1px solid var(--line)}.moderation-item p{flex:1 1 100%;margin:0;color:var(--ink);overflow-wrap:anywhere}.sticker-empty{align-self:center;color:var(--muted);text-align:center}.sticker-wall .wall-sticker{overflow-wrap:anywhere}.sticker-wall .wall-sticker p{white-space:pre-wrap}
 
-/* Guest stickers: content follows the reading order instead of the old contact grid. */
+/* Approved guest notes appear along the garden path, not on a separate board. */
 .contact{display:block;overflow:visible;padding-block:clamp(82px,10vw,124px);min-height:0}
 .contact .story-line{top:clamp(20px,3vw,38px)}
 .contact .archive-top{display:block;margin:0 0 28px;max-width:680px}
-.contact .archive-top h2{max-width:100%;line-height:1.13;overflow-wrap:normal}
+.contact .archive-top h2{max-width:100%;line-height:1.13}
 .contact .archive-top p{max-width:56ch;margin:12px 0 0;line-height:1.55}
-.sticker-wall{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,205px),1fr));justify-items:center;align-items:start;gap:24px;min-height:160px;padding:24px clamp(10px,3vw,32px);margin-bottom:36px;border:1px dashed var(--line);background:color-mix(in srgb,var(--gold-pale) 10%,var(--paper))}
-.sticker-wall .wall-sticker{width:min(100%,260px);min-height:150px;margin:8px 0;flex:none}
-.sticker-wall .wall-sticker p{font-size:clamp(21px,2.4vw,26px);line-height:1.2}
-.sticker-empty{grid-column:1/-1;align-self:center;margin:auto;max-width:48ch;padding:25px;color:var(--muted);text-align:center;line-height:1.5}
+.sticker-wall{position:absolute;inset:0;z-index:4;pointer-events:none}
+.guest-sticker-field{position:absolute;z-index:4;top:22%;right:clamp(-230px,calc((1120px - 100vw)/2 - 210px),-50px);width:clamp(165px,18vw,230px);pointer-events:none}
+.guest-sticker-field[hidden]{display:none}
+.field-hero{top:20%;right:clamp(-230px,calc((1120px - 100vw)/2 - 210px),-50px)}
+.field-about{top:48%;right:clamp(-230px,calc((1120px - 100vw)/2 - 210px),-50px)}
+.field-hobbies{top:42%;right:clamp(-230px,calc((1120px - 100vw)/2 - 210px),-50px)}
+.field-archive{top:58%;right:clamp(-230px,calc((1120px - 100vw)/2 - 210px),-50px)}
+.wall-sticker{position:relative;width:100%;min-height:136px;margin:0;padding:23px 19px 14px;pointer-events:auto;overflow-wrap:anywhere;box-shadow:3px 7px 14px rgba(76,61,29,.15)}
+.wall-sticker p{font-size:clamp(19px,1.8vw,24px);line-height:1.12;margin:10px 0}
+.wall-sticker small{font-family:'DM Sans',sans-serif;font-size:10px;color:#796b4d}
+.wall-one{transform:rotate(-4deg);background:#f2dfd4}.wall-two{transform:rotate(3deg);background:#f1e6bd}.wall-three{transform:rotate(-2deg);background:#e7e5cf}
+.sticker-empty{margin:0;padding:15px;background:color-mix(in srgb,var(--paper) 90%,transparent);border:1px dashed var(--line);color:var(--muted);text-align:center;font-size:13px}
+.sticker-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:clamp(20px,4vw,48px);max-width:980px}
+.sticker-submit,.admin-panel{width:100%;max-width:none;margin:0;min-width:0;transform:none}
+.sticker-submit{padding:clamp(18px,2.5vw,28px);gap:11px}
+.sticker-submit textarea{min-height:115px;resize:vertical}
+.sticker-submit .button{max-width:100%;white-space:normal;text-align:center;line-height:1.3}
+.sticker-submit textarea:focus-visible,.admin-login input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.sticker-status,.admin-status{color:var(--ink);line-height:1.5;overflow-wrap:anywhere}
+.sticker-status:empty,.admin-status:empty{display:none}
+.admin-panel{padding:18px 20px;background:color-mix(in srgb,var(--gold-pale) 24%,var(--paper))}
+.admin-panel summary{min-height:44px;display:list-item;align-content:center;color:var(--ink);font-size:14px;font-weight:600}
+.admin-login{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.admin-login label,.admin-login input,.admin-status{grid-column:1/-1}
+.admin-login input{min-width:0;max-width:100%}
+.admin-login .button{min-height:44px}
+.admin-login [hidden]{display:none}
+.moderation-item{gap:12px}.moderation-item .button{flex:1 1 140px}.button:disabled{opacity:.6;cursor:wait}
+@media(max-width:1200px){.guest-sticker-field{right:2vw;width:clamp(145px,18vw,205px)}.field-hero{right:2vw}.field-about{right:2vw}.field-hobbies{right:2vw}.field-archive{right:2vw}}
+@media(max-width:760px){.contact{display:block;padding-block:76px 85px}.contact .story-line{position:static;margin:0 0 20px}.contact .archive-top{margin-bottom:25px}.sticker-wall{position:static;display:flex;flex-wrap:wrap;gap:10px;margin:0 0 24px;pointer-events:none}.guest-sticker-field{position:static;display:inline-block;vertical-align:top;width:min(47%,220px);margin:8px 1%;pointer-events:none}.guest-sticker-field:empty{display:none}.guest-sticker-field .wall-sticker{min-height:130px;padding:19px 14px 12px}.wall-sticker p{font-size:20px}.sticker-actions{grid-template-columns:1fr;gap:22px}.sticker-submit,.admin-panel{width:100%}}
+@media(max-width:430px){.guest-sticker-field{width:min(48%,190px);margin:6px 0}.guest-sticker-field:nth-of-type(even){margin-left:4%}.guest-sticker-field .wall-sticker{min-height:124px;padding:18px 12px 10px}.wall-sticker p{font-size:19px}.sticker-submit .button{width:100%}}
+@media(max-width:330px){.guest-sticker-field{width:100%;margin:6px 0}.guest-sticker-field:nth-of-type(even){margin-left:0}}
+@media(prefers-reduced-motion:reduce){.contact .story-line{transform:none!important}}
 .sticker-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:clamp(20px,4vw,48px)}
 .sticker-submit,.admin-panel{width:100%;max-width:none;margin:0;min-width:0;transform:none}
 .sticker-submit{padding:clamp(18px,2.5vw,28px);gap:11px}
@@ -107,6 +136,31 @@ body.dark .button-primary,body.dark .toast{color:#20271e;transition:none}
 .moderation-item .button{flex:1 1 140px}
 .button:disabled{opacity:.6;cursor:wait}
 @media(max-width:760px){.contact{display:block;padding-block:76px 85px}.contact .story-line{position:static;margin:0 0 20px}.contact .archive-top{margin-bottom:25px}.sticker-wall{gap:12px;min-height:140px;margin-bottom:25px;padding:15px}.sticker-actions{grid-template-columns:1fr;gap:22px}.sticker-submit,.admin-panel{width:100%}}
-@media(max-width:430px){.sticker-wall{grid-template-columns:repeat(2,minmax(0,1fr))}.sticker-wall .wall-sticker{padding:20px 13px;min-height:145px}.sticker-wall .wall-sticker p{font-size:21px}.sticker-submit .button{width:100%}}
-@media(max-width:330px){.sticker-wall{grid-template-columns:1fr}}
-@media(prefers-reduced-motion:reduce){.contact .story-line{transform:none!important}}
+/* Guest notes live in the page margins, alternating sides between chapters. */
+.sticker-wall{display:none}
+.guest-sticker-field{display:grid;gap:14px;align-content:start}
+.field-hero,.field-hobbies{right:clamp(-230px,calc((1120px - 100vw)/2 - 210px),-50px);left:auto}
+.field-about,.field-archive{left:clamp(-230px,calc((1120px - 100vw)/2 - 210px),-50px);right:auto}
+.field-about{top:34%}.field-archive{top:46%}
+.guest-sticker-field .wall-sticker{width:100%;margin:0}
+@media(max-width:1200px){
+  .guest-sticker-field{width:clamp(145px,18vw,205px)}
+  .field-hero,.field-hobbies{right:2vw}
+  .field-about,.field-archive{left:2vw}
+}
+@media(max-width:760px){
+  .sticker-wall{display:none}
+  .guest-sticker-field{position:static;display:block;width:100%;margin:24px 0 0;pointer-events:none}
+  .guest-sticker-field[hidden]{display:none}
+  .guest-sticker-field .wall-sticker{width:min(100%,260px);margin:0 auto 12px;pointer-events:auto}
+  .field-about,.field-archive{left:auto;right:auto;top:auto}
+}
+@media(prefers-reduced-motion:reduce){.guest-sticker-field .wall-sticker{transition:none}}
+@media(min-width:1201px){
+  .field-hero,.field-hobbies{right:0}
+  .field-about,.field-archive{left:0}
+}
+@media(min-width:761px) and (max-width:1200px){
+  .field-hero,.field-hobbies{right:0}
+  .field-about,.field-archive{left:0}
+}

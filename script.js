@@ -90,7 +90,7 @@ themeButton?.addEventListener('click', () => {
 });
 const stickerForm = document.querySelector('[data-sticker-form]');
 const stickerStatus = document.querySelector('[data-sticker-status]');
-const approvedWall = document.querySelector('[data-approved-stickers]');
+const stickerFields = [...document.querySelectorAll('[data-sticker-field]')];
 const adminForm = document.querySelector('[data-admin-login]');
 const adminStatus = document.querySelector('[data-admin-status]');
 const moderationQueue = document.querySelector('[data-moderation-queue]');
@@ -106,19 +106,38 @@ async function api(path, options={}) {
   return result;
 }
 function renderApproved(items) {
-  if (!approvedWall) return;
-  approvedWall.replaceChildren();
-  if (!items.length) { const empty = document.createElement('p'); empty.className = 'sticker-empty'; empty.textContent = 'Пока нет опубликованных записок. Оставь первую!'; approvedWall.append(empty); return; }
-  const styles = ['wall-one','wall-two','wall-three'];
-  items.forEach((item,index) => {
-    const card = document.createElement('article'); card.className = `paper-sticker wall-sticker ${styles[index % styles.length]}`;
-    const flower = document.createElement('span'); flower.textContent = ['✦','✿','✳'][index % 3];
-    const text = document.createElement('p'); text.textContent = item.text;
-    const date = document.createElement('small'); date.textContent = new Date(item.createdAt).toLocaleDateString('ru-RU');
-    card.append(flower,text,date); approvedWall.append(card);
+  stickerFields.forEach(field => field.replaceChildren());
+  if (!stickerFields.length) return;
+  if (!items.length) {
+    stickerFields.forEach(field => field.hidden = true);
+    return;
+  }
+  stickerFields.forEach(field => field.hidden = false);
+  const styles = ['wall-one', 'wall-two', 'wall-three'];
+  items.forEach((item, index) => {
+    const field = stickerFields[index % stickerFields.length];
+    const card = document.createElement('article');
+    card.className = `paper-sticker wall-sticker ${styles[index % styles.length]}`;
+    const flower = document.createElement('span');
+    flower.setAttribute('aria-hidden', 'true');
+    flower.textContent = ['✦', '✿', '✳'][index % 3];
+    const text = document.createElement('p');
+    text.textContent = item.text;
+    const date = document.createElement('small');
+    date.textContent = new Date(item.createdAt).toLocaleDateString('ru-RU');
+    card.append(flower, text, date);
+    field.append(card);
   });
 }
-async function loadApproved() { try { renderApproved(await api('/api/stickers')); } catch { if (approvedWall) { approvedWall.replaceChildren(); const message = document.createElement('p'); message.className = 'sticker-empty'; message.textContent = 'Записки временно недоступны. Попробуй позже.'; approvedWall.append(message); } } }
+async function loadApproved() {
+  try { renderApproved(await api('/api/stickers')); }
+  catch {
+    stickerFields.forEach(field => {
+      field.replaceChildren();
+      field.hidden = true;
+    });
+  }
+}
 stickerForm?.addEventListener('submit', async event => {
   event.preventDefault(); const button = stickerForm.querySelector('[type="submit"]'); button.disabled = true;
   if (stickerStatus) stickerStatus.textContent = 'Отправляю на проверку…';
