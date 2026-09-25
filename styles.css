@@ -164,3 +164,13 @@ body.dark .button-primary,body.dark .toast{color:#20271e;transition:none}
   .field-hero,.field-hobbies{right:0}
   .field-about,.field-archive{left:0}
 }
+.owner-audio{max-width:820px;margin:26px auto 0;padding:22px 0;border-top:1px solid var(--line);background:none}
+.owner-audio h3{margin:0 0 14px;font-family:'Caveat',cursive;font-size:30px;color:var(--gold)}
+.audio-owner-tools{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:18px}
+.audio-owner-tools[hidden]{display:none}
+.audio-hint,.audio-empty{margin:0;color:var(--muted);font-size:13px}
+.audio-list{display:grid;gap:10px}
+.audio-track{grid-template-columns:minmax(120px,.8fr) minmax(180px,1.8fr) auto;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.audio-track span{overflow-wrap:anywhere;font-weight:600}
+.audio-empty[hidden]{display:none}
+@media(max-width:600px){.audio-track{grid-template-columns:1fr}.audio-track audio{width:100%}}

@@ -9,9 +9,8 @@ if ('IntersectionObserver' in window && !reducedMotion) {
 } else reveals.forEach(item => item.classList.add('is-visible'));
 
 const STEAM_PROFILE_URL = 'https://steamcommunity.com/id/flowertalkerr/';
-const OWNER_PIN = ''; // Архив локален для этого браузера; PIN в клиентском коде не защищает от посетителей.
 const hobbyNotes = {
-  музыка: 'Музыка задаёт погоду внутри дня. Открой личный архив, чтобы послушать мои треки.',
+  музыка: 'Музыка задаёт погоду внутри дня.',
   рисование: 'Рисование помогает думать руками. Лучшие линии обычно появляются без предварительного плана.',
   игры: 'Люблю игры, в которых можно исследовать мир и случайно найти историю за углом.',
   книги: 'Книги хороши тем, что можно ненадолго поселиться в чьей-то другой голове.'
@@ -33,20 +32,31 @@ const dbReady = new Promise((resolve, reject) => {
 dbReady.catch(() => {}); // Не показывать ошибку до обращения к скрытому архиву.
 async function renderTracks() {
   if (!audioList) return;
+  const empty = document.querySelector('[data-audio-empty]');
+  const tools = document.querySelector('[data-audio-owner-tools]');
+  const isOwner = Boolean(adminToken);
+  if (tools) tools.hidden = !isOwner;
   try {
     const db = await dbReady;
     const request = db.transaction('tracks').objectStore('tracks').getAll();
     request.onsuccess = () => {
       audioList.replaceChildren();
-      request.result.forEach(track => {
+      const tracks = request.result;
+      if (empty) empty.hidden = tracks.length > 0;
+      tracks.forEach(track => {
         const row = document.createElement('div'); row.className = 'audio-track';
         const name = document.createElement('span'); name.textContent = track.name;
         const player = document.createElement('audio'); player.controls = true; player.preload = 'none'; player.src = URL.createObjectURL(track.blob); player.setAttribute('aria-label', `Воспроизвести ${track.name}`);
-        const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = 'Удалить'; remove.addEventListener('click', async () => { const db = await dbReady; db.transaction('tracks','readwrite').objectStore('tracks').delete(track.id); renderTracks(); });
-        row.append(name, player, remove); audioList.append(row);
+        row.append(name, player);
+        if (isOwner) {
+          const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = 'Удалить';
+          remove.addEventListener('click', async () => { const db = await dbReady; db.transaction('tracks','readwrite').objectStore('tracks').delete(track.id); renderTracks(); });
+          row.append(remove);
+        }
+        audioList.append(row);
       });
     };
-  } catch { audioList.textContent = 'Не удалось открыть локальное хранилище.'; }
+  } catch { audioList.textContent = 'Не удалось открыть музыкальную библиотеку.'; }
 }
 document.querySelectorAll('[data-hobby]').forEach(button => {
   button.setAttribute('aria-pressed', 'false');
@@ -54,14 +64,12 @@ document.querySelectorAll('[data-hobby]').forEach(button => {
     document.querySelectorAll('[data-hobby]').forEach(item => item.setAttribute('aria-pressed', 'false'));
     button.setAttribute('aria-pressed', 'true');
     if (detail) detail.textContent = hobbyNotes[button.dataset.hobby];
-    if (button.dataset.hobby === 'музыка' && ownerAudio && OWNER_PIN) {
-      const pin = window.prompt('Личный PIN для музыкального архива:');
-      ownerAudio.hidden = pin !== OWNER_PIN;
-      if (pin === OWNER_PIN) renderTracks();
-    } else if (ownerAudio) ownerAudio.hidden = true;
+    if (ownerAudio) ownerAudio.hidden = button.dataset.hobby !== 'музыка';
+    if (button.dataset.hobby === 'музыка') renderTracks();
   });
 });
 audioInput?.addEventListener('change', async () => {
+  if (!adminToken) { if (audioList) audioList.textContent = 'Войдите в модерацию владельца, чтобы добавлять треки.'; return; }
   const files = [...audioInput.files].filter(file => file.type === 'audio/mpeg' || file.name.toLowerCase().endsWith('.mp3'));
   try {
     const db = await dbReady;
@@ -160,10 +168,10 @@ async function loadQueue() {
 }
 adminForm?.addEventListener('submit', async event => {
   event.preventDefault(); adminToken = adminForm.querySelector('input').value;
-  try { await loadQueue(); adminStatus.textContent = 'Вход выполнен. Новые стикеры ждут решения.'; adminForm.querySelector('input').value = ''; adminLogout.hidden = false; }
-  catch { adminToken = ''; adminStatus.textContent = 'Пароль неверный или сервер недоступен.'; }
+  try { await loadQueue(); adminStatus.textContent = 'Вход выполнен. Новые стикеры ждут решения.'; adminForm.querySelector('input').value = ''; adminLogout.hidden = false; renderTracks(); }
+  catch { adminToken = ''; adminStatus.textContent = 'Пароль неверный или сервер недоступен.'; renderTracks(); }
 });
-adminLogout?.addEventListener('click',()=>{adminToken='';moderationQueue.replaceChildren();adminStatus.textContent='Вы вышли из панели.';adminLogout.hidden=true;});
+adminLogout?.addEventListener('click',()=>{adminToken='';moderationQueue.replaceChildren();adminStatus.textContent='Вы вышли из панели.';adminLogout.hidden=true;renderTracks();});
 loadApproved();
 const parallaxItems = [...document.querySelectorAll('[data-parallax]')];
 const chapters = [...document.querySelectorAll('.garden-chapter')];
