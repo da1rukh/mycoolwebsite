@@ -146,10 +146,11 @@ document.addEventListener('click', event => { if (!event.target.closest('.weathe
     const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=55.7558&longitude=37.6173&current=temperature_2m,precipitation,weather_code&timezone=Europe%2FMoscow', {cache:'no-store'});
     if (!response.ok) throw new Error('weather unavailable');
     const data = await response.json(), current = data.current, code = current.weather_code;
+    const descriptions = {0:'ясно',1:'преимущественно ясно',2:'переменная облачность',3:'пасмурно',45:'туман',48:'изморозь',51:'слабая морось',53:'морось',55:'сильная морось',61:'слабый дождь',63:'дождь',65:'сильный дождь',66:'ледяной дождь',67:'сильный ледяной дождь',71:'слабый снег',73:'снег',75:'сильный снег',77:'снежная крупа',80:'слабый ливень',81:'ливень',82:'сильный ливень',85:'слабый снегопад',86:'сильный снегопад',95:'гроза',96:'гроза с градом',99:'сильная гроза с градом'};
     const rainy = current.precipitation > 0 || [51,53,55,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99].includes(code);
     if (weatherTemp) weatherTemp.textContent = `${Math.round(current.temperature_2m)}°`;
-    if (weatherSummary) weatherSummary.textContent = `Москва · ${Math.round(current.temperature_2m)}° · ${rainy ? 'осадки или облачность' : 'без осадков'}`;
-    if (weatherLabels.sun) weatherLabels.sun[1] = rainy ? 'Пасмурно' : 'Ясно';
+    if (weatherSummary) weatherSummary.textContent = `Москва · ${Math.round(current.temperature_2m)}° · ${descriptions[code] || 'переменная погода'}`;
+    if (weatherLabels.sun) weatherLabels.sun[1] = rainy ? 'Облачно' : 'Ясно';
     const hour = Number(new Intl.DateTimeFormat('ru-RU',{timeZone:'Europe/Moscow',hour:'2-digit',hourCycle:'h23'}).format(new Date()));
     setGardenWeather(hour >= 21 || hour < 6 ? 'night' : rainy ? 'rain' : 'sun');
   } catch { if (weatherSummary) weatherSummary.textContent = 'Москва · погода временно недоступна'; setGardenWeather('sun'); }
