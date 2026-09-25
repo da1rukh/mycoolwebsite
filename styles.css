@@ -211,3 +211,8 @@ body.dark .button-primary,body.dark .toast{color:#20271e;transition:none}
 @media(max-width:760px){.sticker-move-button{opacity:1;width:36px;height:36px}}
 
 .approved-sticker-tools{display:grid;gap:8px;margin-top:14px}.approved-sticker-tool{display:flex;align-items:center;gap:10px;padding:9px;background:color-mix(in srgb,var(--gold-pale) 22%,var(--paper));border:1px solid var(--line)}.approved-sticker-tool span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}.approved-sticker-tool .button{min-height:38px;padding:5px 12px}
+
+/* Keep guest notes above the fixed golden scroll thread. */
+.garden-atmosphere{z-index:0!important}
+.guest-sticker-field{z-index:100!important}
+.guest-sticker-field .wall-sticker{z-index:101!important}
