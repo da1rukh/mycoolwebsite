@@ -240,3 +240,12 @@ body.dark .button-primary,body.dark .toast{color:#20271e;transition:none}
 .sticker-submit textarea{background:color-mix(in srgb,var(--paper) 86%,var(--gold-pale));color:var(--ink);border-color:var(--line)}
 .sticker-submit textarea::placeholder{color:var(--muted)}
 @media(max-width:760px){.site-header nav{margin-left:auto;margin-right:8px}.header-tools{gap:5px}.header-admin[open]{top:calc(100% + 10px)}.header-admin[open]>summary.owner-button{top:-49px}.header-admin>summary.owner-button{min-height:36px}}
+
+/* Keep the open moderation dropdown out of the header flex layout. */
+.site-header .header-tools{position:static}
+.site-header .header-admin{flex:0 0 42px;display:block;align-self:center;box-sizing:border-box}
+.site-header .header-admin:not([open]){width:42px;height:42px}
+.site-header .header-admin[open]{position:fixed!important;top:calc(74px + 10px)!important;right:7vw!important;left:auto!important;bottom:auto!important;width:min(380px,calc(100vw - 32px))!important;max-width:calc(100vw - 32px)!important;height:auto!important;max-height:calc(100vh - 100px);overflow:auto;box-sizing:border-box;padding:20px!important;margin:0!important;transform:none!important;background:var(--paper)!important;border:1px solid var(--line)!important;box-shadow:0 14px 38px var(--shadow);z-index:30}
+.site-header .header-admin[open]>summary.owner-button{position:static!important;display:grid;width:42px;height:42px;margin:-7px -7px 12px auto;min-height:42px}
+.site-header .header-admin .admin-login{width:100%;min-width:0}
+@media(max-width:760px){.site-header .header-admin{flex-basis:36px}.site-header .header-admin:not([open]){width:36px;height:36px}.site-header .header-admin[open]{top:calc(64px + 8px)!important;right:5vw!important}.site-header .header-admin[open]>summary.owner-button{width:36px;height:36px;min-height:36px}}
