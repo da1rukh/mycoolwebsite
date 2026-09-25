@@ -216,3 +216,13 @@ body.dark .button-primary,body.dark .toast{color:#20271e;transition:none}
 .garden-atmosphere{z-index:0!important}
 .guest-sticker-field{z-index:100!important}
 .guest-sticker-field .wall-sticker{z-index:101!important}
+
+/* Layer the fixed thread behind page sections, but keep sticker notes above it. */
+.garden-atmosphere{z-index:1!important}
+.garden-chapter{z-index:2}
+.guest-sticker-field{z-index:3!important}
+.guest-sticker-field .wall-sticker{z-index:4!important}
+.owner-button{flex:0 0 42px;width:42px;height:42px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;background:transparent;color:var(--ink);cursor:pointer;transition:color .2s,border-color .2s,background .2s}
+.owner-button:hover{color:var(--gold);border-color:var(--gold);background:color-mix(in srgb,var(--gold-pale) 35%,transparent)}
+.owner-button svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:760px){.owner-button{flex-basis:36px;width:36px;height:36px}.owner-button svg{width:19px;height:19px}}
