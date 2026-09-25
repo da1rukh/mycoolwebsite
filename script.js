@@ -151,7 +151,7 @@ function renderApproved(items) {
     date.textContent = new Date(item.createdAt).toLocaleDateString('ru-RU');
     card.append(flower, text, date);
     if (item.position && Number.isFinite(item.position.x) && Number.isFinite(item.position.y)) {
-      card.style.left = `calc(${item.position.x * 100}% - ${item.position.x * card.offsetWidth}px)`; card.style.top = `calc(${item.position.y * 100}% - ${item.position.y * card.offsetHeight}px)`;
+      card.style.left = `calc(${item.position.x * 100}vw - ${item.position.x * card.offsetWidth}px)`; card.style.top = `calc(${item.position.y * 100}vh - ${item.position.y * card.offsetHeight}px)`;
     }
     if (adminToken) {
       card.classList.add('admin-draggable'); card.title = 'Перетащите стикер, чтобы изменить его положение';
@@ -161,10 +161,9 @@ function renderApproved(items) {
         const cardBounds = card.getBoundingClientRect();
         const dragOffset = { x: event.clientX - cardBounds.left, y: event.clientY - cardBounds.top };
         const move = e => {
-          const bounds = field.getBoundingClientRect();
-          const x = Math.max(0, Math.min(1, (e.clientX - bounds.left - dragOffset.x) / Math.max(1, bounds.width - card.offsetWidth)));
-          const y = Math.max(0, Math.min(1, (e.clientY - bounds.top - dragOffset.y) / Math.max(1, bounds.height - card.offsetHeight)));
-          card.style.left = `calc(${x * 100}% - ${x * card.offsetWidth}px)`; card.style.top = `calc(${y * 100}% - ${y * card.offsetHeight}px)`; card.dataset.position = JSON.stringify({x,y});
+          const x = Math.max(0, Math.min(1, (e.clientX + window.scrollX - dragOffset.x) / Math.max(1, document.documentElement.scrollWidth - card.offsetWidth)));
+          const y = Math.max(0, Math.min(1, (e.clientY + window.scrollY - dragOffset.y) / Math.max(1, document.documentElement.scrollHeight - card.offsetHeight)));
+          card.style.left = `calc(${x * 100}vw - ${x * card.offsetWidth}px)`; card.style.top = `calc(${y * 100}vh - ${y * card.offsetHeight}px)`; card.dataset.position = JSON.stringify({x,y});
         };
         const finish = async () => {
           card.removeEventListener('pointermove', move); card.removeEventListener('pointerup', finish); card.removeEventListener('pointercancel', finish);
