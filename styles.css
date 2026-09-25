@@ -174,3 +174,19 @@ body.dark .button-primary,body.dark .toast{color:#20271e;transition:none}
 .audio-track span{overflow-wrap:anywhere;font-weight:600}
 .audio-empty[hidden]{display:none}
 @media(max-width:600px){.audio-track{grid-template-columns:1fr}.audio-track audio{width:100%}}
+
+/* A little flower-shaped player, in place of the browser's white audio bar. */
+.audio-track{grid-template-columns:minmax(0,1fr) minmax(260px,1.5fr) auto;gap:18px;padding:16px 18px;border:1px solid color-mix(in srgb,var(--gold) 25%,var(--line));border-radius:22px;background:color-mix(in srgb,var(--gold-pale) 30%,var(--paper));box-shadow:0 8px 22px var(--shadow)}
+.audio-track>span{min-width:0;padding:0 8px 0 4px;overflow-wrap:anywhere;line-height:1.45}
+.audio-track audio{display:none}
+.flower-controls{min-width:0;display:grid;grid-template-columns:40px 38px 55px minmax(75px,1fr);align-items:center;gap:10px;padding:8px 13px 8px 9px;border:1px solid color-mix(in srgb,var(--gold) 36%,var(--line));border-radius:999px;background:color-mix(in srgb,var(--paper) 88%,var(--gold-pale));}
+.flower-vinyl{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:radial-gradient(circle,var(--paper) 0 19%,transparent 21%),conic-gradient(from 10deg,var(--gold-light),#f3e2aa,var(--green),var(--gold-light));color:var(--gold);font-size:23px;box-shadow:0 2px 8px var(--shadow);transition:transform .3s}
+.is-playing .flower-vinyl{animation:flower-record-spin 5s linear infinite}
+@keyframes flower-record-spin{to{transform:rotate(360deg)}}
+.flower-play{width:34px;height:34px;display:grid;place-items:center;border:0;border-radius:50%;background:var(--green);color:#fff;cursor:pointer;font-size:13px;line-height:1;transition:transform .2s,background .2s}
+.flower-play:hover{transform:scale(1.08);background:var(--gold)}
+.flower-time{font-size:11px;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.flower-seek{width:100%;height:5px;accent-color:var(--green);cursor:pointer}
+.audio-track>button{border-radius:999px;padding:7px 12px}
+@media(max-width:700px){.audio-track{grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:13px 14px}.audio-track>span{padding-left:4px}.flower-controls{grid-column:1/-1;grid-row:2;grid-template-columns:38px 36px 55px minmax(60px,1fr)}.audio-track>button{grid-column:2;grid-row:1}.audio-track audio{display:none}}
+@media(prefers-reduced-motion:reduce){.is-playing .flower-vinyl{animation:none}}

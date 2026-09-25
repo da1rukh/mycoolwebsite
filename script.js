@@ -46,8 +46,21 @@ async function renderTracks() {
       tracks.forEach(track => {
         const row = document.createElement('div'); row.className = 'audio-track';
         const name = document.createElement('span'); name.textContent = track.name;
-        const player = document.createElement('audio'); player.controls = true; player.preload = 'none'; player.src = URL.createObjectURL(track.blob); player.setAttribute('aria-label', `Воспроизвести ${track.name}`);
-        row.append(name, player);
+        const player = document.createElement('audio'); player.preload = 'metadata'; player.src = URL.createObjectURL(track.blob); player.setAttribute('aria-label', `Воспроизвести ${track.name}`);
+        const controls = document.createElement('div'); controls.className = 'flower-controls';
+        const play = document.createElement('button'); play.type = 'button'; play.className = 'flower-play'; play.textContent = '▶'; play.setAttribute('aria-label', `Воспроизвести ${track.name}`);
+        const clock = document.createElement('span'); clock.className = 'flower-time'; clock.textContent = '0:00 / 0:00';
+        const seek = document.createElement('input'); seek.type = 'range'; seek.className = 'flower-seek'; seek.min = '0'; seek.max = '1000'; seek.value = '0'; seek.setAttribute('aria-label', `Позиция трека ${track.name}`);
+        const flower = document.createElement('span'); flower.className = 'flower-vinyl'; flower.textContent = '✿'; flower.setAttribute('aria-hidden', 'true');
+        const formatTime = value => { if (!Number.isFinite(value)) return '0:00'; const seconds = Math.floor(value); return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`; };
+        play.addEventListener('click', async () => { if (player.paused) { document.querySelectorAll('.audio-track audio').forEach(other => { if (other !== player) other.pause(); }); try { await player.play(); } catch {} } else player.pause(); });
+        player.addEventListener('play', () => { play.textContent = 'Ⅱ'; play.setAttribute('aria-label', `Приостановить ${track.name}`); row.classList.add('is-playing'); });
+        player.addEventListener('pause', () => { play.textContent = '▶'; play.setAttribute('aria-label', `Воспроизвести ${track.name}`); row.classList.remove('is-playing'); });
+        player.addEventListener('ended', () => { player.currentTime = 0; seek.value = '0'; });
+        player.addEventListener('timeupdate', () => { clock.textContent = `${formatTime(player.currentTime)} / ${formatTime(player.duration)}`; seek.value = String(player.duration ? Math.round(player.currentTime / player.duration * 1000) : 0); });
+        player.addEventListener('loadedmetadata', () => { clock.textContent = `0:00 / ${formatTime(player.duration)}`; });
+        seek.addEventListener('input', () => { if (player.duration) player.currentTime = Number(seek.value) / 1000 * player.duration; });
+        controls.append(flower, play, clock, seek); row.append(name, player, controls);
         if (isOwner) {
           const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = 'Удалить';
           remove.addEventListener('click', async () => { const db = await dbReady; db.transaction('tracks','readwrite').objectStore('tracks').delete(track.id); renderTracks(); });
