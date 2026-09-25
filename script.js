@@ -51,6 +51,7 @@ async function renderTracks() {
         const play = document.createElement('button'); play.type = 'button'; play.className = 'flower-play'; play.textContent = '▶'; play.setAttribute('aria-label', `Воспроизвести ${track.name}`);
         const clock = document.createElement('span'); clock.className = 'flower-time'; clock.textContent = '0:00 / 0:00';
         const seek = document.createElement('input'); seek.type = 'range'; seek.className = 'flower-seek'; seek.min = '0'; seek.max = '1000'; seek.value = '0'; seek.setAttribute('aria-label', `Позиция трека ${track.name}`);
+        const volume = document.createElement('input'); volume.type = 'range'; volume.className = 'flower-volume'; volume.min = '0'; volume.max = '1'; volume.step = '0.01'; volume.value = '0.8'; volume.setAttribute('aria-label', `Громкость трека ${track.name}`); player.volume = Number(volume.value);
         const flower = document.createElement('span'); flower.className = 'flower-vinyl'; flower.textContent = '✿'; flower.setAttribute('aria-hidden', 'true');
         const formatTime = value => { if (!Number.isFinite(value)) return '0:00'; const seconds = Math.floor(value); return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`; };
         play.addEventListener('click', async () => { if (player.paused) { document.querySelectorAll('.audio-track audio').forEach(other => { if (other !== player) other.pause(); }); try { await player.play(); } catch {} } else player.pause(); });
@@ -60,7 +61,8 @@ async function renderTracks() {
         player.addEventListener('timeupdate', () => { clock.textContent = `${formatTime(player.currentTime)} / ${formatTime(player.duration)}`; seek.value = String(player.duration ? Math.round(player.currentTime / player.duration * 1000) : 0); });
         player.addEventListener('loadedmetadata', () => { clock.textContent = `0:00 / ${formatTime(player.duration)}`; });
         seek.addEventListener('input', () => { if (player.duration) player.currentTime = Number(seek.value) / 1000 * player.duration; });
-        controls.append(flower, play, clock, seek); row.append(name, player, controls);
+        volume.addEventListener('input', () => { player.volume = Number(volume.value); });
+        controls.append(flower, play, clock, seek, volume); row.append(name, player, controls);
         if (isOwner) {
           const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = 'Удалить';
           remove.addEventListener('click', async () => { const db = await dbReady; db.transaction('tracks','readwrite').objectStore('tracks').delete(track.id); renderTracks(); });
