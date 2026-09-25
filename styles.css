@@ -192,4 +192,6 @@ body.dark .button-primary,body.dark .toast{color:#20271e;transition:none}
 @media(max-width:700px){.audio-track{grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:13px 14px}.audio-track>span{padding-left:4px}.flower-controls{grid-column:1/-1;grid-row:2;grid-template-columns:38px 36px 55px minmax(60px,1fr) 68px}.flower-volume{width:68px}.audio-track>button{grid-column:2;grid-row:1}.audio-track audio{display:none}}
 @media(prefers-reduced-motion:reduce){.is-playing .flower-vinyl{animation:none}}
 
-.guest-sticker-field{position:relative}.guest-sticker-field .wall-sticker[style*=left]{position:absolute;z-index:5;margin:0;transform:rotate(-2deg)}.guest-sticker-field .admin-draggable{cursor:grab;touch-action:none}.guest-sticker-field .admin-draggable:active{cursor:grabbing}
+.guest-sticker-field{display:block;min-height:390px;position:relative;overflow:visible}.guest-sticker-field .wall-sticker[style*=left]{position:absolute;z-index:5;width:min(100%,220px);margin:0;transform:rotate(-2deg)}.guest-sticker-field .admin-draggable{cursor:grab;touch-action:none;user-select:none}.guest-sticker-field .admin-draggable:active{cursor:grabbing}
+
+@media(max-width:760px){.guest-sticker-field{min-height:250px;display:block}.guest-sticker-field .wall-sticker[style*=left]{width:min(48%,220px)}}
