@@ -163,7 +163,7 @@ const server = createServer(async (req, res) => {
       const found = await mutate(items => {
         const item = items.find(candidate => candidate.id === move[1] && candidate.status === 'approved');
         if (!item) return false;
-        item.position = { x: data.x, y: data.y };
+        item.position = { x: data.x, y: data.y, ...(typeof data.field === 'string' && /^[\w-]+$/.test(data.field) ? { field: data.field } : {}) };
         return true;
       });
       return found ? send(res, 200, { ok: true }) : send(res, 404, { error: 'Стикер не найден.' });

@@ -141,14 +141,21 @@ function renderApproved(items) {
       const button = document.createElement('button'); button.type = 'button'; button.className = 'button button-quiet'; button.textContent = 'Курсор';
       button.addEventListener('click', async () => {
         const card = [...document.querySelectorAll('[data-sticker-id]')].find(node => node.dataset.stickerId === item.id);
-        const field = card?.parentElement;
-        if (!card || !field) { if (adminStatus) adminStatus.textContent = 'Не удалось найти стикер на странице.'; return; }
+        if (!card) { if (adminStatus) adminStatus.textContent = 'Не удалось найти стикер в списке.'; return; }
+        const pageY = lastPointer.y + window.scrollY;
+        const targetSection = [...document.querySelectorAll('.garden-chapter')].find(section => {
+          const rect = section.getBoundingClientRect(); const top = rect.top + window.scrollY;
+          return pageY >= top && pageY <= top + section.offsetHeight;
+        }) || document.querySelector('#contact');
+        const field = targetSection?.querySelector('[data-sticker-field]');
+        if (!field) { if (adminStatus) adminStatus.textContent = 'Не удалось определить секцию под курсором.'; return; }
         const bounds = field.getBoundingClientRect();
         const x = Math.max(0, Math.min(1, (lastPointer.x - bounds.left - card.offsetWidth / 2) / Math.max(1, bounds.width - card.offsetWidth)));
         const y = Math.max(0, Math.min(1, (lastPointer.y - bounds.top - card.offsetHeight / 2) / Math.max(1, bounds.height - card.offsetHeight)));
-        const position = {x,y};
+        const position = {x,y,field:field.dataset.stickerField};
+        field.append(card);
         card.style.left = `calc(${x * 100}% - ${x * card.offsetWidth}px)`; card.style.top = `calc(${y * 100}% - ${y * card.offsetHeight}px)`;
-        try { await api(`/api/admin/stickers/${encodeURIComponent(item.id)}/position`, {method:'PATCH', body:JSON.stringify(position)}); if (adminStatus) adminStatus.textContent = 'Стикер перенесён к курсору.'; }
+        try { await api(`/api/admin/stickers/${encodeURIComponent(item.id)}/position`, {method:'PATCH', body:JSON.stringify(position)}); if (adminStatus) adminStatus.textContent = 'Стикер перенесён к курсору и сохранён.'; }
         catch (error) { if (adminStatus) adminStatus.textContent = error.message; loadApproved(); }
       });
       row.append(label, button); approvedStickerTools.append(row);
@@ -163,7 +170,7 @@ function renderApproved(items) {
   stickerFields.forEach(field => field.hidden = false);
   const styles = ['wall-one', 'wall-two', 'wall-three'];
   items.forEach((item, index) => {
-    const field = stickerFields[index % stickerFields.length];
+    const field = stickerFields.find(candidate => candidate.dataset.stickerField === item.position?.field) || stickerFields[index % stickerFields.length];
     const card = document.createElement('article');
     card.className = `paper-sticker wall-sticker ${styles[index % styles.length]}`;
     card.dataset.stickerId = item.id;
