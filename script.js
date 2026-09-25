@@ -143,10 +143,15 @@ function renderApproved(items) {
         const card = [...document.querySelectorAll('[data-sticker-id]')].find(node => node.dataset.stickerId === item.id);
         if (!card) { if (adminStatus) adminStatus.textContent = 'Не удалось найти стикер в списке.'; return; }
         const pageY = lastPointer.y + window.scrollY;
-        const targetSection = [...document.querySelectorAll('.garden-chapter')].find(section => {
+        const sections = [...document.querySelectorAll('.garden-chapter')];
+        const targetSection = sections.find(section => {
           const rect = section.getBoundingClientRect(); const top = rect.top + window.scrollY;
           return pageY >= top && pageY <= top + section.offsetHeight;
-        }) || document.querySelector('#contact');
+        }) || sections.reduce((best, section) => {
+          const rect = section.getBoundingClientRect(); const top = rect.top + window.scrollY;
+          const distance = pageY < top ? top - pageY : pageY - (top + section.offsetHeight);
+          return !best || distance < best.distance ? {section, distance} : best;
+        }, null)?.section;
         const field = targetSection?.querySelector('[data-sticker-field]');
         if (!field) { if (adminStatus) adminStatus.textContent = 'Не удалось определить секцию под курсором.'; return; }
         const bounds = field.getBoundingClientRect();
@@ -207,11 +212,16 @@ function renderApproved(items) {
           const bounds = field.getBoundingClientRect();
           const x = Math.max(0, Math.min(1, (e.clientX - bounds.left - dragOffset.x) / Math.max(1, bounds.width - card.offsetWidth)));
           const y = Math.max(0, Math.min(1, (e.clientY - bounds.top - dragOffset.y) / Math.max(1, bounds.height - card.offsetHeight)));
-          card.style.left = `calc(${x * 100}% - ${x * card.offsetWidth}px)`; card.style.top = `calc(${y * 100}% - ${y * card.offsetHeight}px)`; card.dataset.position = JSON.stringify({x,y});
+          card.style.left = `calc(${x * 100}% - ${x * card.offsetWidth}px)`; card.style.top = `calc(${y * 100}% - ${y * card.offsetHeight}px)`; card.dataset.position = JSON.stringify({x,y,field:field.dataset.stickerField});
         };
         const finish = async () => {
           card.removeEventListener('pointermove', move); card.removeEventListener('pointerup', finish); card.removeEventListener('pointercancel', finish);
           if (!card.dataset.position) return;
+          const pageY = lastPointer.y + window.scrollY;
+          const sections = [...document.querySelectorAll('.garden-chapter')];
+          const targetSection = sections.find(section => { const top = section.getBoundingClientRect().top + window.scrollY; return pageY >= top && pageY <= top + section.offsetHeight; }) || sections.reduce((best, section) => { const top = section.getBoundingClientRect().top + window.scrollY; const distance = pageY < top ? top - pageY : pageY - (top + section.offsetHeight); return !best || distance < best.distance ? {section, distance} : best; }, null)?.section;
+          const targetField = targetSection?.querySelector('[data-sticker-field]') || field;
+          if (targetField !== field) { const bounds = targetField.getBoundingClientRect(); const x = Math.max(0, Math.min(1, (lastPointer.x - bounds.left - dragOffset.x) / Math.max(1, bounds.width - card.offsetWidth))); const y = Math.max(0, Math.min(1, (lastPointer.y - bounds.top - dragOffset.y) / Math.max(1, bounds.height - card.offsetHeight))); targetField.append(card); card.style.left = `calc(${x * 100}% - ${x * card.offsetWidth}px)`; card.style.top = `calc(${y * 100}% - ${y * card.offsetHeight}px)`; card.dataset.position = JSON.stringify({x,y,field:targetField.dataset.stickerField}); }
           try { await api(`/api/admin/stickers/${encodeURIComponent(item.id)}/position`, {method:'PATCH', body:card.dataset.position}); delete card.dataset.position; if (adminStatus) adminStatus.textContent = 'Положение стикера сохранено.'; }
           catch (error) { if (adminStatus) adminStatus.textContent = error.message; loadApproved(); }
         };
@@ -227,7 +237,7 @@ document.addEventListener('pointermove', event => {
   const x = Math.max(0, Math.min(1, (event.clientX - bounds.left - card.offsetWidth / 2) / Math.max(1, bounds.width - card.offsetWidth)));
   const y = Math.max(0, Math.min(1, (event.clientY - bounds.top - card.offsetHeight / 2) / Math.max(1, bounds.height - card.offsetHeight)));
   card.style.left = `calc(${x * 100}% - ${x * card.offsetWidth}px)`; card.style.top = `calc(${y * 100}% - ${y * card.offsetHeight}px)`;
-  card.dataset.position = JSON.stringify({x,y});
+  card.dataset.position = JSON.stringify({x,y,field:field.dataset.stickerField});
 });
 document.addEventListener('click', async event => {
   if (!stickerPlacement || event.target.closest('.sticker-move-button')) return;
