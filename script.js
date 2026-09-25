@@ -188,9 +188,6 @@ function renderApproved(items) {
     const date = document.createElement('small');
     date.textContent = new Date(item.createdAt).toLocaleDateString('ru-RU');
     card.append(flower, text, date);
-    if (item.position && Number.isFinite(item.position.x) && Number.isFinite(item.position.y)) {
-      card.style.left = `calc(${item.position.x * 100}% - ${item.position.x * card.offsetWidth}px)`; card.style.top = `calc(${item.position.y * 100}% - ${item.position.y * card.offsetHeight}px)`;
-    }
     if (adminToken) {
       const moveButton = document.createElement('button');
       moveButton.type = 'button'; moveButton.className = 'sticker-move-button'; moveButton.textContent = '↗';
@@ -229,6 +226,11 @@ function renderApproved(items) {
       });
     }
     field.append(card);
+    if (item.position && Number.isFinite(item.position.x) && Number.isFinite(item.position.y)) {
+      // Measure only after insertion: detached cards report zero dimensions and drift on reload.
+      card.style.left = `calc(${item.position.x * 100}% - ${item.position.x * card.offsetWidth}px)`;
+      card.style.top = `calc(${item.position.y * 100}% - ${item.position.y * card.offsetHeight}px)`;
+    }
   });
 }
 document.addEventListener('pointermove', event => {
