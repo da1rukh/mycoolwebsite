@@ -13,7 +13,7 @@ const hobbyNotes = {
   музыка: 'Музыка задаёт погоду внутри дня.',
   рисование: 'Рисование помогает думать руками. Лучшие линии обычно появляются без предварительного плана.',
   игры: 'Люблю игры, в которых можно исследовать мир и случайно найти историю за углом.',
-  книги: 'Книги хороши тем, что можно ненадолго поселиться в чьей-то другой голове.'
+  общение: 'Буду рад знакомству — выбирай удобный способ связи.'
 };
 const detail = document.querySelector('.hobby-detail');
 const ownerAudio = document.querySelector('[data-owner-audio]');
@@ -79,6 +79,7 @@ document.querySelectorAll('[data-hobby]').forEach(button => {
     document.querySelectorAll('[data-hobby]').forEach(item => item.setAttribute('aria-pressed', 'false'));
     button.setAttribute('aria-pressed', 'true');
     if (detail) detail.textContent = hobbyNotes[button.dataset.hobby];
+    const socialLinks = document.querySelector('[data-social-links]'); if (socialLinks) socialLinks.hidden = button.dataset.hobby !== 'общение';
     if (ownerAudio) ownerAudio.hidden = button.dataset.hobby !== 'музыка';
     if (button.dataset.hobby === 'музыка') renderTracks();
   });
