@@ -336,3 +336,5 @@ body[data-rain="true"] .garden-chapter::after{content:"";position:absolute;inset
 .steam-link[hidden]{display:none}
 @media(max-width:760px){.flower-grid{width:min(100%,520px);margin-top:34px;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.hobby-flower{max-width:180px;min-height:165px}}
 @media(max-width:420px){.flower-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:2px}.hobby-flower{padding-inline:3px;min-height:150px}.hobby-flower strong{font-size:13px}.hobby-flower small{font-size:10px}.favorite-games{padding:15px 17px}}
+
+.admin-theme-control{display:grid;gap:6px;margin:12px 0;color:var(--ink);font-size:13px}.admin-theme-control[hidden]{display:none}.admin-theme-control select{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--ink);accent-color:var(--green)}

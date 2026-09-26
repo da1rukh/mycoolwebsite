@@ -136,7 +136,11 @@ const weatherTemp = document.querySelector('[data-weather-temp]');
 const weatherIcon = document.querySelector('[data-weather-icon]');
 const phaseLabels = {dawn:['☼','Рассвет'],noon:['☀','Полдень'],sunset:['◒','Закат'],night:['☾','Ночь']};
 let weatherTimer, phaseTimer, savedWeather = null;
+let adminThemeOverride = 'auto';
+const adminThemeControl = document.querySelector('[data-admin-theme-control]');
+const adminThemeSelect = document.querySelector('[data-admin-theme]');
 function setGardenPhase(phase) {
+  if (adminToken && adminThemeOverride !== 'auto') phase = adminThemeOverride;
   if (!phaseLabels[phase]) return;
   document.body.dataset.timeOfDay = phase;
   if (weatherIcon) weatherIcon.textContent = phaseLabels[phase][0];
@@ -180,6 +184,7 @@ function localFallbackPhase(now=new Date()) {
   return 'night';
 }
 function refreshLocalPhase() {
+  if (adminToken && adminThemeOverride !== 'auto') { setGardenPhase(adminThemeOverride); return; }
   if(savedWeather?.sunrise&&savedWeather?.sunset) setGardenPhase(phaseFromSolarEvents(new Date(),savedWeather.sunrise,savedWeather.sunset,savedWeather.isDay));
   else setGardenPhase(localFallbackPhase());
 }
@@ -404,10 +409,11 @@ async function loadQueue() {
 }
 adminForm?.addEventListener('submit', async event => {
   event.preventDefault(); adminToken = adminForm.querySelector('input').value;
-  try { await loadQueue(); adminStatus.textContent = 'Вход выполнен. Новые стикеры ждут решения.'; adminForm.querySelector('input').value = ''; adminLogout.hidden = false; renderTracks(); await loadApproved(); }
-  catch { adminToken = ''; adminStatus.textContent = 'Пароль неверный или сервер недоступен.'; renderTracks(); }
+  try { await loadQueue(); adminStatus.textContent = 'Вход выполнен. Новые стикеры ждут решения.'; adminForm.querySelector('input').value = ''; adminLogout.hidden = false; try { adminThemeOverride = sessionStorage.getItem('admin-garden-theme') || 'auto'; } catch {} if (adminThemeSelect) adminThemeSelect.value = adminThemeOverride; if (adminThemeControl) adminThemeControl.hidden = false; adminThemeOverride = adminThemeSelect?.value || 'auto'; renderTracks(); refreshLocalPhase(); await loadApproved(); }
+  catch { adminToken = ''; adminStatus.textContent = 'Пароль неверный или сервер недоступен.'; if (adminThemeControl) adminThemeControl.hidden = true; renderTracks(); }
 });
-adminLogout?.addEventListener('click',()=>{adminToken='';moderationQueue.replaceChildren();approvedStickerTools?.replaceChildren();loadApproved();adminStatus.textContent='Вы вышли из панели.';adminLogout.hidden=true;renderTracks();});
+adminLogout?.addEventListener('click',()=>{adminToken='';adminThemeOverride='auto';if(adminThemeControl)adminThemeControl.hidden=true;if(adminThemeSelect)adminThemeSelect.value='auto';moderationQueue.replaceChildren();approvedStickerTools?.replaceChildren();loadApproved();adminStatus.textContent='Вы вышли из панели.';adminLogout.hidden=true;refreshLocalPhase();renderTracks();});
+adminThemeSelect?.addEventListener('change',()=>{if(!adminToken)return;adminThemeOverride=adminThemeSelect.value;try{sessionStorage.setItem('admin-garden-theme',adminThemeOverride)}catch{} refreshLocalPhase();});
 loadApproved();
 const parallaxItems = [...document.querySelectorAll('[data-parallax]')];
 const chapters = [...document.querySelectorAll('.garden-chapter')];
