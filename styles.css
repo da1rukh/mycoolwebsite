@@ -283,3 +283,19 @@ body[data-weather="sun"] .garden-atmosphere{filter:saturate(1.12)}body[data-weat
 body.dark[data-weather="night"] .garden-chapter{background-color:color-mix(in srgb,var(--paper) 92%,#56647b)}body.dark[data-weather="rain"] .garden-chapter{background-color:color-mix(in srgb,var(--paper) 96%,#647f83)}
 
 .social-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:8px auto 0;max-width:820px}.social-links[hidden]{display:none}.social-links a{display:flex;flex-direction:column;gap:3px;padding:15px 18px;border:1px solid var(--line);background:color-mix(in srgb,var(--gold-pale) 28%,var(--paper));transition:border-color .2s,transform .2s}.social-links a:hover{border-color:var(--gold);transform:translateY(-3px)}.social-links a span{font-size:12px;color:var(--muted)}.social-links a strong{font-size:14px;color:var(--ink);overflow-wrap:anywhere}@media(max-width:760px){.social-links{grid-template-columns:1fr;gap:8px;margin-top:4px}.social-links a{flex-direction:row;align-items:center;justify-content:space-between;padding:12px 15px}}
+
+/* Weather paints the garden only; base tokens remain owned by the manual theme. */
+body[data-weather="sun"] .garden-chapter{background-color:color-mix(in srgb,var(--paper) 92%,#efd48a)}
+body[data-weather="rain"] .garden-chapter{background-color:color-mix(in srgb,var(--paper) 90%,#9db9bd)}
+body[data-weather="night"] .garden-chapter{background-color:color-mix(in srgb,var(--paper) 78%,#26384f)}
+body[data-weather="night"] .garden-chapter::before{background:radial-gradient(ellipse at 76% 38%,rgba(164,181,225,.24),transparent 65%)}
+body[data-weather="night"] .sun-orb{background:radial-gradient(circle at 45% 45%,#dce8ff 0,#a8b9e8 35%,rgba(153,173,225,.2) 69%,transparent 71%);opacity:.85;filter:none}
+body[data-weather="night"] .flower-hero .petal{background:linear-gradient(135deg,#e7c8fa,#8b72c5 80%);filter:none;box-shadow:inset 5px 0 10px rgba(248,235,255,.6),0 0 18px rgba(185,157,241,.35)}
+body[data-weather="night"] .flower-hero .flower-core{background:radial-gradient(circle at 35% 35%,#c89a60,#59436b);border-color:#f2d58c}
+body[data-weather="night"] .garden-note{color:#d7cff4}
+body[data-weather="night"] .garden-atmosphere{filter:saturate(.9);opacity:.9}
+body[data-weather="night"] .atmosphere-thread{filter:drop-shadow(0 0 6px rgba(170,190,245,.75))}
+body[data-weather="night"] .garden-rain{opacity:0}
+body[data-weather="night"]:not(.dark) .flower-hero{filter:none}
+body.dark[data-weather="night"] .garden-chapter{background-color:color-mix(in srgb,var(--paper) 70%,#1c2b43)}
+body.dark[data-weather="night"] .garden-chapter::before{background:radial-gradient(ellipse at 76% 38%,rgba(164,181,225,.18),transparent 65%)}
