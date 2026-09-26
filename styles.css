@@ -338,3 +338,8 @@ body[data-rain="true"] .garden-chapter::after{content:"";position:absolute;inset
 @media(max-width:420px){.flower-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:2px}.hobby-flower{padding-inline:3px;min-height:150px}.hobby-flower strong{font-size:13px}.hobby-flower small{font-size:10px}.favorite-games{padding:15px 17px}}
 
 .admin-theme-control{display:grid;gap:6px;margin:12px 0;color:var(--ink);font-size:13px}.admin-theme-control[hidden]{display:none}.admin-theme-control select{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--ink);accent-color:var(--green)}
+
+/* Let the golden thread flow past the footer instead of ending abruptly at the viewport edge. */
+.garden-atmosphere{overflow:visible!important}
+.garden-atmosphere svg{overflow:visible}
+.garden-atmosphere .atmosphere-thread{vector-effect:non-scaling-stroke}
