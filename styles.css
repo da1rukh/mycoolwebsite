@@ -300,9 +300,9 @@
 
 /* Four complete, automatically selected garden palettes. Rain stays independent. */
 :root{--paper:#fbf7ee;--ink:#302b32;--muted:#716873;--gold:#bd8050;--gold-light:#efc77d;--gold-pale:#f5e5c7;--green:#59715a;--line:#ded2c8;--pink:#f1d6c9;--shadow:rgba(89,61,56,.14);--scene:#fbf7ee;--scene-glow:#f6d9ba;--scene-flower:#d99789;--scene-leaf:#71856b}
-body[data-time-of-day="dawn"]{--paper:#fff2e9;--ink:#493747;--muted:#806b7a;--gold:#c77a63;--gold-light:#f4c98c;--gold-pale:#f7dfd5;--green:#68765f;--line:#e8cfc9;--shadow:rgba(110,68,82,.14);--scene:#fff2e9;--scene-glow:#ffcba6;--scene-flower:#d991a5;--scene-leaf:#71856b}
+body[data-time-of-day="dawn"]{--paper:#d8bdb5;--ink:#302230;--muted:#594653;--gold:#a95d4c;--gold-light:#dba66f;--gold-pale:#cba79f;--green:#53664e;--line:#b29591;--shadow:rgba(55,34,47,.24);--scene:#d8bdb5;--scene-glow:#dc9d7d;--scene-flower:#bd7188;--scene-leaf:#5c7058}
 body[data-time-of-day="noon"]{--paper:#fbf8e9;--ink:#2e3425;--muted:#70745d;--gold:#b98522;--gold-light:#f1d373;--gold-pale:#f4e8bd;--green:#536d43;--line:#dfd8ba;--shadow:rgba(91,82,36,.13);--scene:#fbf8e9;--scene-glow:#f4df91;--scene-flower:#e4ba55;--scene-leaf:#5f794c}
-body[data-time-of-day="sunset"]{--paper:#f8eee9;--ink:#49313e;--muted:#806472;--gold:#bd7052;--gold-light:#efb477;--gold-pale:#f0d9d0;--green:#675c60;--line:#dfc9ca;--shadow:rgba(98,55,76,.16);--scene:#f8eee9;--scene-glow:#edaa83;--scene-flower:#bc7897;--scene-leaf:#687064}
+body[data-time-of-day="sunset"]{--paper:#c9a9a8;--ink:#2d202d;--muted:#58434f;--gold:#a85843;--gold-light:#d69b62;--gold-pale:#bb999b;--green:#51484d;--line:#a98991;--shadow:rgba(48,30,46,.27);--scene:#c9a9a8;--scene-glow:#d68b6e;--scene-flower:#a95f80;--scene-leaf:#586057}
 body[data-time-of-day="night"]{--paper:#1e2434;--ink:#f2eaf5;--muted:#c0b4ca;--gold:#e1bb78;--gold-light:#f3d89d;--gold-pale:#383247;--green:#a8bd9c;--line:#444052;--shadow:rgba(5,8,20,.42);--scene:#1e2434;--scene-glow:#a2b7e8;--scene-flower:#b49ad8;--scene-leaf:#819b82}
 body{background:radial-gradient(ellipse at 78% 13%,color-mix(in srgb,var(--scene-glow) 17%,transparent),transparent 38%),var(--paper);transition:background-color 1.2s,color 1.2s}
 .site-header{transition:background-color 1.2s,border-color 1.2s}.grain{background-image:radial-gradient(color-mix(in srgb,var(--gold) 38%,transparent) .45px,transparent .6px);transition:opacity 1s}
