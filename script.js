@@ -20,7 +20,9 @@ const ownerAudio = document.querySelector('[data-owner-audio]');
 const audioList = document.querySelector('[data-audio-list]');
 const audioInput = document.querySelector('[data-audio-files]');
 const steamLink = document.querySelector('[data-steam-link] a');
-if (STEAM_PROFILE_URL && steamLink) { steamLink.href = STEAM_PROFILE_URL; steamLink.parentElement.hidden = false; }
+if (STEAM_PROFILE_URL && steamLink) steamLink.href = STEAM_PROFILE_URL;
+const favoriteGames = document.querySelector('[data-favorite-games]');
+const steamPanel = document.querySelector('[data-steam-link]');
 let audioDb;
 const dbReady = new Promise((resolve, reject) => {
   if (!('indexedDB' in window)) return reject(new Error('Хранилище недоступно'));
@@ -79,7 +81,10 @@ document.querySelectorAll('[data-hobby]').forEach(button => {
     document.querySelectorAll('[data-hobby]').forEach(item => item.setAttribute('aria-pressed', 'false'));
     button.setAttribute('aria-pressed', 'true');
     if (detail) detail.textContent = hobbyNotes[button.dataset.hobby];
-    const socialLinks = document.querySelector('[data-social-links]'); if (socialLinks) socialLinks.hidden = button.dataset.hobby !== 'общение';
+    const selected = button.dataset.hobby;
+    const socialLinks = document.querySelector('[data-social-links]'); if (socialLinks) socialLinks.hidden = selected !== 'общение';
+    if (favoriteGames) favoriteGames.hidden = selected !== 'игры';
+    if (steamPanel) steamPanel.hidden = selected !== 'игры';
     if (ownerAudio) ownerAudio.hidden = button.dataset.hobby !== 'музыка';
     if (button.dataset.hobby === 'музыка') renderTracks();
   });

@@ -323,3 +323,16 @@ body[data-rain="true"] .garden-rain{opacity:.58}body[data-rain="true"] .garden-r
 body[data-rain="true"] .garden-chapter::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 25%,rgba(170,202,224,.08) 50%,transparent 75%);background-size:240% 100%;animation:rain-sheen 8s linear infinite}
 @keyframes rain-sheen{to{background-position:-240% 0}}
 @media(prefers-reduced-motion:reduce){body,.site-header,.garden-chapter,.garden-chapter::before,.sun-orb,.flower-hero .petal,.flower-hero .flower-core,.stem,.leaf,.weather-popover{transition:none!important}body[data-rain="true"] .garden-rain i{animation:none}}
+
+/* Keep the flower choices as a compact, centered group. */
+.flower-grid{width:min(100%,760px);margin:58px auto 0;grid-template-columns:repeat(3,minmax(0,1fr));justify-items:center;justify-content:center}
+.hobby-flower{width:100%;max-width:210px}
+.favorite-games{max-width:500px;margin:18px auto 0;padding:18px 24px;text-align:left;border:1px solid var(--line);background:color-mix(in srgb,var(--gold-pale) 35%,var(--paper));color:var(--ink)}
+.favorite-games[hidden]{display:none}
+.favorite-games h3{margin:0 0 10px;text-align:center;font-size:16px;color:var(--green)}
+.favorite-games ul{display:grid;gap:7px;margin:0;padding:0;list-style:none}
+.favorite-games li{position:relative;padding-left:22px;font-size:14px}
+.favorite-games li::before{content:"✿";position:absolute;left:0;color:var(--gold)}
+.steam-link[hidden]{display:none}
+@media(max-width:760px){.flower-grid{width:min(100%,520px);margin-top:34px;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.hobby-flower{max-width:180px;min-height:165px}}
+@media(max-width:420px){.flower-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:2px}.hobby-flower{padding-inline:3px;min-height:150px}.hobby-flower strong{font-size:13px}.hobby-flower small{font-size:10px}.favorite-games{padding:15px 17px}}
