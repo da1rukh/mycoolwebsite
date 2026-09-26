@@ -262,6 +262,10 @@
 @media(max-width:760px){.site-header .header-tools{gap:5px!important}.site-header .header-admin,.site-header .header-admin[open]{flex-basis:36px!important;width:36px!important;min-width:36px!important;max-width:36px!important;height:36px!important;min-height:36px!important;max-height:36px!important}.site-header .header-admin>summary.owner-button,.site-header .header-admin[open]>summary.owner-button{width:36px!important;height:36px!important;min-height:36px!important}.site-header .header-admin>summary.owner-button svg{flex-basis:19px!important;width:19px!important;height:19px!important}.site-header .header-admin[open]>form.admin-login,.site-header .header-admin[open]>.moderation-queue,.site-header .header-admin[open]>.approved-sticker-tools{right:auto;top:auto}}
 
 
+/* Give the open moderation panel its own width; the shield stays compact. */
+.site-header .header-admin[open]{position:fixed!important;inset:72px 5vw auto auto!important;flex:0 1 auto!important;width:min(380px,calc(100vw - 32px))!important;min-width:0!important;max-width:calc(100vw - 32px)!important;height:auto!important;min-height:0!important;max-height:calc(100vh - 88px)!important;overflow-y:auto!important;overflow-x:hidden!important;box-sizing:border-box!important;padding:16px!important;margin:0!important;background:var(--paper)!important;border:1px solid var(--line)!important;box-shadow:0 14px 38px var(--shadow)!important;z-index:50!important}
+@media(max-width:760px){.site-header .header-admin[open]{inset:68px 16px auto auto!important;width:min(420px,calc(100vw - 32px))!important;max-width:calc(100vw - 32px)!important}}
+
 /* Garden trail, seasonal weather and music-reactive stem. */
 .garden-trail{position:fixed;inset:0;z-index:8;overflow:hidden;pointer-events:none}
 .pollen-mote{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--gold-light);box-shadow:0 0 10px 2px color-mix(in srgb,var(--gold) 45%,transparent);animation:pollen-float .95s ease-out forwards}
