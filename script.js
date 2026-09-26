@@ -129,47 +129,88 @@ const weatherPopover = document.querySelector('[data-weather-popover]');
 const weatherSummary = document.querySelector('[data-weather-summary]');
 const weatherTemp = document.querySelector('[data-weather-temp]');
 const weatherIcon = document.querySelector('[data-weather-icon]');
-const weatherLabels = {sun:['☀','Солнечно'],rain:['🌧','Тёплый дождь'],night:['☾','Ночной сад']};
-let weatherTimer;
-function setGardenWeather(mode) {
-  document.body.dataset.weather = mode;
-  if (weatherIcon && weatherLabels[mode]) weatherIcon.textContent = weatherLabels[mode][0];
-  document.querySelectorAll('[data-weather-mode]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.weatherMode === mode)));
+const phaseLabels = {dawn:['☼','Рассвет'],noon:['☀','Полдень'],sunset:['◒','Закат'],night:['☾','Ночь']};
+let weatherTimer, phaseTimer, savedWeather = null;
+function setGardenPhase(phase) {
+  if (!phaseLabels[phase]) return;
+  document.body.dataset.timeOfDay = phase;
+  if (weatherIcon) weatherIcon.textContent = phaseLabels[phase][0];
+  if (weatherSummary && savedWeather) weatherSummary.textContent = `${phaseLabels[phase][1]} · ${savedWeather.description}`;
+}
+function timeMinutes(value) {
+  if (typeof value !== 'string') return null;
+  const match = value.match(/T(\d{2}):(\d{2})/);
+  return match ? Number(match[1])*60+Number(match[2]) : null;
+}
+function phaseFromSolarEvents(now, sunrise, sunset, isDay) {
+  const rise=timeMinutes(sunrise), set=timeMinutes(sunset);
+  const parts=new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(now);
+  const hour=Number(parts.find(p=>p.type==='hour')?.value||0), minute=Number(parts.find(p=>p.type==='minute')?.value||0), current=hour*60+minute;
+  if (rise===null || set===null || rise===set) {
+    if (isDay===0) return 'night';
+    if (current>=300&&current<420) return 'dawn';
+    if (current>=1020&&current<1200) return 'sunset';
+    return isDay===1?'noon':'night';
+  }
+  const dawnStart=(rise-45+1440)%1440, dawnEnd=(rise+75)%1440;
+  const sunsetStart=(set-90+1440)%1440, sunsetEnd=(set+60)%1440;
+  const within=(v,a,b)=>a<=b?v>=a&&v<b:v>=a||v<b;
+  if (within(current,dawnStart,dawnEnd)) return 'dawn';
+  if (within(current,sunsetStart,sunsetEnd)) return 'sunset';
+  return isDay===0?'night':'noon';
+}
+function setRain(raining) {
+  document.body.dataset.rain = raining ? 'true' : 'false';
 }
 weatherToggle?.addEventListener('click', () => {
-  const open = weatherPopover.hidden; weatherPopover.hidden = !open;
-  weatherToggle.setAttribute('aria-expanded', String(open));
+  const open=weatherPopover.hidden; weatherPopover.hidden=!open;
+  weatherToggle.setAttribute('aria-expanded',String(open));
 });
-document.querySelectorAll('[data-weather-mode]').forEach(button => button.addEventListener('click', () => setGardenWeather(button.dataset.weatherMode)));
-document.addEventListener('click', event => { if (!event.target.closest('.weather-widget') && weatherPopover && !weatherPopover.hidden) { weatherPopover.hidden = true; weatherToggle?.setAttribute('aria-expanded','false'); } });
+document.addEventListener('click',event=>{if(!event.target.closest('.weather-widget')&&weatherPopover&&!weatherPopover.hidden){weatherPopover.hidden=true;weatherToggle?.setAttribute('aria-expanded','false')}});
+function localFallbackPhase(now=new Date()) {
+  const hour=now.getHours();
+  if(hour>=5&&hour<7)return 'dawn';
+  if(hour>=7&&hour<16)return 'noon';
+  if(hour>=16&&hour<20)return 'sunset';
+  return 'night';
+}
+function refreshLocalPhase() {
+  if(savedWeather?.sunrise&&savedWeather?.sunset) setGardenPhase(phaseFromSolarEvents(new Date(),savedWeather.sunrise,savedWeather.sunset,savedWeather.isDay));
+  else setGardenPhase(localFallbackPhase());
+}
 function getWeatherCoordinates() {
-  return new Promise(resolve => {
-    if (!navigator.geolocation) return resolve([55.7558,37.6173]);
-    navigator.geolocation.getCurrentPosition(position => resolve([position.coords.latitude,position.coords.longitude]), () => resolve([55.7558,37.6173]), {timeout:4000,maximumAge:3600000});
+  return new Promise(resolve=>{
+    if(!navigator.geolocation)return resolve(null);
+    navigator.geolocation.getCurrentPosition(p=>resolve([p.coords.latitude,p.coords.longitude]),()=>resolve(null),{timeout:5000,maximumAge:3600000});
   });
 }
 async function refreshGardenWeather() {
   try {
-    const [latitude,longitude] = await getWeatherCoordinates();
-    const url = new URL('https://api.open-meteo.com/v1/forecast');
-    url.search = new URLSearchParams({latitude,longitude,current:'temperature_2m,precipitation,weather_code,is_day',timezone:'auto'}).toString();
-    const response = await fetch(url,{cache:'no-store'});
-    if (!response.ok) throw new Error('weather unavailable');
-    const data = await response.json(), current = data.current, code = current.weather_code;
-    const descriptions = {0:'ясно',1:'преимущественно ясно',2:'переменная облачность',3:'пасмурно',45:'туман',48:'изморозь',51:'слабая морось',53:'морось',55:'сильная морось',61:'слабый дождь',63:'дождь',65:'сильный дождь',66:'ледяной дождь',67:'сильный ледяной дождь',71:'слабый снег',73:'снег',75:'сильный снег',77:'снежная крупа',80:'слабый ливень',81:'ливень',82:'сильный ливень',85:'слабый снегопад',86:'сильный снегопад',95:'гроза',96:'гроза с градом',99:'сильная гроза с градом'};
-    const rainy = current.precipitation > 0 || [51,53,55,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99].includes(code);
-    if (weatherTemp) weatherTemp.textContent = `${Math.round(current.temperature_2m)}°`;
-    if (weatherSummary) weatherSummary.textContent = `${Math.round(current.temperature_2m)}° · ${descriptions[code] || 'переменная погода'}`;
-    weatherLabels.sun[1] = rainy ? 'Облачно' : 'Ясно';
-    setGardenWeather(current.is_day === 0 ? 'night' : rainy ? 'rain' : 'sun');
+    const coordinates=await getWeatherCoordinates();
+    if(!coordinates) throw new Error('location unavailable');
+    const url=new URL('https://api.open-meteo.com/v1/forecast');
+    url.search=new URLSearchParams({latitude:coordinates[0],longitude:coordinates[1],current:'temperature_2m,precipitation,weather_code,is_day',daily:'sunrise,sunset',timezone:'auto',forecast_days:'1'}).toString();
+    const response=await fetch(url,{cache:'no-store'});
+    if(!response.ok)throw new Error('weather unavailable');
+    const data=await response.json(), current=data.current, code=current.weather_code;
+    const descriptions={0:'ясно',1:'преимущественно ясно',2:'переменная облачность',3:'пасмурно',45:'туман',48:'изморозь',51:'слабая морось',53:'морось',55:'сильная морось',61:'слабый дождь',63:'дождь',65:'сильный дождь',66:'ледяной дождь',67:'сильный ледяной дождь',71:'слабый снег',73:'снег',75:'сильный снег',77:'снежная крупа',80:'слабый ливень',81:'ливень',82:'сильный ливень',85:'слабый снегопад',86:'сильный снегопад',95:'гроза',96:'гроза с градом',99:'сильная гроза с градом'};
+    const rainCodes=[51,53,55,61,63,65,66,67,80,81,82,95,96,99];
+    savedWeather={description:descriptions[code]||'переменная погода',sunrise:data.daily?.sunrise?.[0],sunset:data.daily?.sunset?.[0],isDay:current.is_day};
+    if(weatherTemp)weatherTemp.textContent=`${Math.round(current.temperature_2m)}°`;
+    if(weatherSummary)weatherSummary.textContent=`${phaseLabels[phaseFromSolarEvents(new Date(),savedWeather.sunrise,savedWeather.sunset,savedWeather.isDay)][1]} · ${savedWeather.description}`;
+    setRain(current.precipitation>0||rainCodes.includes(code));
+    refreshLocalPhase();
   } catch {
-    if (weatherSummary) weatherSummary.textContent = 'Прогноз временно недоступен';
-    if (!document.body.dataset.weather) setGardenWeather('sun');
+    if(weatherTemp)weatherTemp.textContent='';
+    if(weatherSummary)weatherSummary.textContent='Прогноз недоступен · время суток по часам устройства';
+    if(!savedWeather)setRain(false);
+    refreshLocalPhase();
   } finally {
-    window.clearTimeout(weatherTimer);
-    weatherTimer = window.setTimeout(refreshGardenWeather,15*60*1000);
+    clearTimeout(weatherTimer);weatherTimer=setTimeout(refreshGardenWeather,15*60*1000);
+    clearInterval(phaseTimer);phaseTimer=setInterval(refreshLocalPhase,60*1000);
   }
 }
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshLocalPhase()});
 refreshGardenWeather();
 
 const ambientToggle = document.querySelector('[data-ambient-toggle]');
@@ -186,10 +227,6 @@ ambientToggle?.addEventListener('change', () => {
   } catch { ambientToggle.checked = false; }
 });
 
-const themeButton = document.querySelector('.theme-button');
-themeButton?.addEventListener('click', () => {
-  const enabled = document.body.classList.toggle('dark'); themeButton.setAttribute('aria-pressed', String(enabled)); themeButton.textContent = enabled ? '☾' : '☼';
-});
 const stickerForm = document.querySelector('[data-sticker-form]');
 const stickerStatus = document.querySelector('[data-sticker-status]');
 const stickerFields = [...document.querySelectorAll('[data-sticker-field]')];
