@@ -3,71 +3,267 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Личный цифровой сад flowertalker: мысли, увлечения и маленькие проекты." />
-  <title>flowertalker | золотой сад</title>
+  <meta name="description" content="flowertalker — личный сад из музыки, рисунков, игр и мыслей." />
+  <meta name="theme-color" content="#faf8ef" />
+  <title>flowertalker — золотой сад</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <div class="progress" aria-hidden="true"><span></span></div>
-  <div class="grain" aria-hidden="true"></div>
+  <script type="application/json" id="site-content">{}</script>
+  <a class="skip-link" href="#main">к содержимому</a>
+
   <header class="site-header">
-    <div class="garden-atmosphere" aria-hidden="true"><svg viewBox="0 0 100 1000" preserveAspectRatio="none"><path class="atmosphere-thread" pathLength="1" d="M12 0 C78 110 18 190 72 280 S20 410 78 520 S20 650 83 760 S30 900 88 1000"/><path class="atmosphere-branch" d="M72 280 C42 258 28 232 18 205 M78 520 C58 492 48 466 45 430 M83 760 C55 742 38 716 30 684"/></svg><span class="orbit orbit-one">✳</span><span class="orbit orbit-two">✿</span><span class="orbit orbit-three">✽</span></div>
-    <a class="wordmark" href="#top" aria-label="На главную">flower<span>•</span>talker</a>
-    <nav aria-label="Основная навигация"><a href="#about">обо мне</a><a href="#hobbies">увлечения</a><a href="#notes">заметки</a><a href="#contact">стикеры</a></nav>
-    <button class="theme-button" type="button" aria-label="Переключить тему" aria-pressed="false">☼</button>
+    <a class="wordmark" href="#top" aria-label="flowertalker — в начало">flower<span aria-hidden="true">•</span>talker</a>
+    <nav class="site-nav" aria-label="Разделы">
+      <a href="#step-seed" data-edit="nav.grow">как растёт</a>
+      <a href="#about" data-edit="nav.about">садовник</a>
+      <a href="#bloom" data-edit="nav.bloom">что цветёт</a>
+      <a href="#herbarium" data-edit="nav.herbarium">гербарий</a>
+    </nav>
+    <div class="day-clock" aria-hidden="true"><span class="day-clock-sun"></span><span data-clock>05:40</span></div>
+    <button class="theme-button" type="button" aria-pressed="false" aria-label="Тёмная тема">
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="icon-sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="icon-moon"><path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1Z"/></svg>
+    </button>
+    <div class="day-progress" aria-hidden="true"><span></span></div>
   </header>
-  <main id="top">
-    <section class="hero section-shell garden-chapter" data-garden-state="dawn" data-story-state="seed">
-      <p class="story-line">Сначала была одна маленькая идея.</p>
-      <div class="hero-copy reveal"><p class="eyebrow">личный цифровой сад</p><h1>Привет, я <em>flowertalker.</em><br>Здесь всё цветёт.</h1><p class="hero-intro">Место для мыслей, любимых вещей, странных идей и проектов, которые пока только прорастают.</p><div class="hero-actions"><a class="button button-primary" href="#about">зайти внутрь <span>↘</span></a><button class="button button-quiet" type="button" data-water>полить сад <span>✦</span></button></div></div>
-      <div class="hero-garden reveal reveal-delay" data-parallax="hero" aria-label="Иллюстрация золотого цветка"><div class="sun-orb"></div><div class="flower flower-hero" data-flower="главный цветок"><span class="petal p1"></span><span class="petal p2"></span><span class="petal p3"></span><span class="petal p4"></span><span class="petal p5"></span><span class="petal p6"></span><span class="flower-core"></span></div><span class="garden-note note-one">не трогать<br>до весны</span><span class="garden-note note-two">тут живут<br>хорошие идеи</span><div class="stem stem-main"></div><div class="leaf leaf-main"></div></div>
-      <div class="guest-sticker-field field-hero" data-sticker-field="hero" aria-label="Гостевая записка"></div>
+
+  <main id="main">
+    <!-- Hero and the growth story share one pinned stage: the flower grows as the chapters scroll past. -->
+    <section class="grow" id="top" aria-label="Как растёт сад">
+      <div class="grow-copy">
+        <div class="hero" data-step="0">
+          <p class="hand-note" data-edit="hero.note">личный цифровой сад</p>
+          <h1>
+            <span class="hero-line" data-edit="hero.title1">Привет, это</span>
+            <span class="hero-name" data-edit="hero.title2">flowertalker</span>
+          </h1>
+          <p class="hero-intro" data-edit="hero.intro" data-multiline>Сад из музыки, рисунков, игр и мыслей. Листай вниз — он вырастет у тебя на глазах.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#step-seed"><span data-edit="hero.cta">смотреть, как растёт</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15M5.5 12.5 12 19l6.5-6.5"/></svg></a>
+            <button class="button button-quiet" type="button" data-water><span data-edit="hero.water">полить сад</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5c3.6 4.4 5.6 7.6 5.6 10.2a5.6 5.6 0 0 1-11.2 0c0-2.6 2-5.8 5.6-10.2Z"/></svg></button>
+          </div>
+        </div>
+
+        <article class="step" id="step-seed" data-step="1">
+          <p class="step-time"><time data-edit="story.1.time">05:40</time> <span data-edit="story.1.phase">семя</span></p>
+          <h2 data-edit="story.1.title">Всё начинается с мелочи</h2>
+          <p data-edit="story.1.text" data-multiline>Строчка из песни, странный сон, цвет неба в шесть утра. Я записываю такие вещи, пока они не улетели, — из них потом и растёт всё остальное.</p>
+        </article>
+        <article class="step" data-step="2">
+          <p class="step-time"><time data-edit="story.2.time">09:15</time> <span data-edit="story.2.phase">корни</span></p>
+          <h2 data-edit="story.2.title">Корни — это любопытство</h2>
+          <p data-edit="story.2.text" data-multiline>Мне интересно, как всё устроено: люди, игры, музыка, собственная голова. Отсюда типология, долгие разговоры и сотня открытых вкладок.</p>
+        </article>
+        <article class="step" data-step="3">
+          <p class="step-time"><time data-edit="story.3.time">13:00</time> <span data-edit="story.3.phase">стебель</span></p>
+          <h2 data-edit="story.3.title">Рост — это практика</h2>
+          <p data-edit="story.3.text" data-multiline>Рисовать без плана. Переслушивать альбом целиком. Проходить игру до последнего секрета. Не ради результата — ради самого процесса.</p>
+        </article>
+        <article class="step" data-step="4">
+          <p class="step-time"><time data-edit="story.4.time">18:30</time> <span data-edit="story.4.phase">цветок</span></p>
+          <h2 data-edit="story.4.title">А потом всё расцветает</h2>
+          <p data-edit="story.4.text" data-multiline>Этот сайт и есть такой цветок: всё, что я люблю, на одной клумбе. Здесь можно смотреть, трогать и открывать — дальше по странице.</p>
+        </article>
+      </div>
+
+      <div class="stage" aria-hidden="true">
+        <div class="stage-inner">
+          <div class="sun-orb"></div>
+          <svg class="plant" viewBox="0 0 320 440" focusable="false">
+            <path class="ground" d="M20 330 C90 322 230 338 300 328"/>
+            <g class="roots">
+              <path pathLength="1" d="M160 330 C156 352 140 366 122 388"/>
+              <path pathLength="1" d="M160 330 C166 356 186 370 204 396"/>
+              <path pathLength="1" d="M160 332 C160 360 156 384 162 414"/>
+              <path pathLength="1" d="M146 362 C134 368 120 368 108 362"/>
+              <path pathLength="1" d="M178 372 C190 374 204 372 214 364"/>
+            </g>
+            <ellipse class="seed" cx="160" cy="328" rx="11" ry="7.5"/>
+            <path class="stem" pathLength="1" d="M160 328 C152 280 172 236 158 190 C150 162 160 140 160 122"/>
+            <g class="leaf leaf-left"><path d="M158 256 C130 254 104 238 94 214 C122 212 148 226 158 256Z"/><path class="vein" d="M156 252 C136 244 116 230 100 217"/></g>
+            <g class="leaf leaf-right"><path d="M162 214 C186 204 214 206 232 222 C208 236 182 236 162 214Z"/><path class="vein" d="M164 215 C184 216 206 218 226 222"/></g>
+            <g class="bloom">
+              <g transform="rotate(0 160 112)"><ellipse class="petal p1" cx="160" cy="76" rx="20" ry="36"/></g>
+              <g transform="rotate(60 160 112)"><ellipse class="petal p2" cx="160" cy="76" rx="20" ry="36"/></g>
+              <g transform="rotate(120 160 112)"><ellipse class="petal p3" cx="160" cy="76" rx="20" ry="36"/></g>
+              <g transform="rotate(180 160 112)"><ellipse class="petal p4" cx="160" cy="76" rx="20" ry="36"/></g>
+              <g transform="rotate(240 160 112)"><ellipse class="petal p5" cx="160" cy="76" rx="20" ry="36"/></g>
+              <g transform="rotate(300 160 112)"><ellipse class="petal p6" cx="160" cy="76" rx="20" ry="36"/></g>
+              <circle class="core" cx="160" cy="112" r="19"/>
+              <circle class="core-dots" cx="160" cy="112" r="13"/>
+            </g>
+          </svg>
+          <p class="stage-note stage-note-1" data-edit="stage.note1">не трогать до весны</p>
+          <p class="stage-note stage-note-2" data-edit="stage.note2">тут живут хорошие идеи</p>
+          <p class="stage-phase"><span data-stage-phase>семя</span></p>
+        </div>
+      </div>
     </section>
-    <section class="about section-shell garden-chapter" id="about" data-garden-state="morning" data-story-state="roots">
-      <p class="story-line">Чтобы вырасти, ему понадобилась почва.</p><div class="section-heading reveal"><span class="section-mark">01</span><h2>Немного<br><i>почвы.</i></h2></div>
-      <div class="about-grid"><figure class="portrait reveal"><img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=720&h=900&q=85" alt="Золотые цветы в тёплом солнечном свете" loading="lazy"><figcaption>фото из архива<br>состояние: любопытно</figcaption></figure><div class="about-copy reveal reveal-delay"><p class="large-copy">Я собираю маленькие миры. Иногда в коде, иногда в заметках, иногда в плейлисте на 3 часа.</p><p>Люблю вещи с характером: неровные линии, найденные истории, цветы, которые растут куда хотят, и сайты, в которых хочется задержаться.</p><div class="fact-list"><div><span>сейчас учусь</span><strong>замечать детали</strong></div><div><span>лучший режим</span><strong>чай и тихая музыка</strong></div><div><span>суперсила</span><strong>собирать атмосферу</strong></div></div><div class="about-tabs"><details class="about-tab"><summary>kin-list</summary><ul><li><strong>Sword</strong> <span>— Phighting!</span></li><li><strong>d3rLord3</strong> <span>— WTDNE</span></li><li><strong>dragondudes3</strong> <span>— RAHH</span></li><li><strong>Flowery</strong> <span>— Deltarune</span></li></ul></details><details class="about-tab"><summary>психологический портрет</summary><p>[LII] INTP | 6w7 so/sp 683 | so6w7–so8w7–sp3w4 | LVFE ≈ LVEF | сангвиник-флегматик с холерическим акцентом</p></details></div></div></div>
-      <div class="guest-sticker-field field-about" data-sticker-field="about" aria-label="Гостевая записка"></div>
+
+    <section class="about" id="about" aria-labelledby="about-title">
+      <div class="about-grid">
+        <figure class="portrait" data-reveal>
+          <img data-image="about.photo" src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=720&h=900&q=80" alt="Золотые цветы в тёплом солнечном свете" width="720" height="900" loading="lazy" decoding="async">
+          <figcaption data-edit="about.caption" data-multiline>фото из архива
+состояние: любопытно</figcaption>
+        </figure>
+        <div class="about-copy">
+          <p class="hand-note" data-edit="about.note">кто здесь садовник</p>
+          <h2 id="about-title" data-edit="about.title" data-reveal>Я собираю маленькие миры — в рисунках, в коде и в плейлистах на три часа.</h2>
+          <p class="about-text" data-edit="about.text" data-multiline data-reveal>Люблю вещи с характером: неровные линии, найденные истории и цветы, которые растут куда хотят. И сайты, в которых хочется задержаться подольше.</p>
+          <dl class="facts" data-reveal>
+            <div><dt data-edit="about.fact1.label">сейчас учусь</dt><dd data-edit="about.fact1.value">замечать детали</dd></div>
+            <div><dt data-edit="about.fact2.label">лучший режим</dt><dd data-edit="about.fact2.value">чай и тихая музыка</dd></div>
+            <div><dt data-edit="about.fact3.label">суперсила</dt><dd data-edit="about.fact3.value">собирать атмосферу</dd></div>
+            <div><dt data-edit="about.fact4.label">часовой пояс</dt><dd data-edit="about.fact4.value">где-то между ночью и утром</dd></div>
+          </dl>
+          <div class="drawers">
+            <details class="drawer">
+              <summary><span data-edit="about.kin.title">kin-list</span></summary>
+              <ul class="kin-list">
+                <li><strong data-edit="about.kin.1.name">Sword</strong> <span data-edit="about.kin.1.from">Phighting!</span></li>
+                <li><strong data-edit="about.kin.2.name">d3rLord3</strong> <span data-edit="about.kin.2.from">WTDNE</span></li>
+                <li><strong data-edit="about.kin.3.name">dragondudes3</strong> <span data-edit="about.kin.3.from">RAHH</span></li>
+                <li><strong data-edit="about.kin.4.name">Flowery</strong> <span data-edit="about.kin.4.from">Deltarune</span></li>
+                <li><strong data-edit="about.kin.5.name"></strong> <span data-edit="about.kin.5.from"></span></li>
+                <li><strong data-edit="about.kin.6.name"></strong> <span data-edit="about.kin.6.from"></span></li>
+              </ul>
+            </details>
+            <details class="drawer">
+              <summary><span data-edit="about.psy.title">психологический портрет</span></summary>
+              <p data-edit="about.psy.text" data-multiline>[LII] INTP · 6w7 so/sp 683 · so6w7–so8w7–sp3w4 · LVFE ≈ LVEF · сангвиник-флегматик с холерическим акцентом</p>
+            </details>
+          </div>
+        </div>
+      </div>
     </section>
-    <section class="hobbies section-shell garden-chapter" id="hobbies" data-garden-state="noon" data-story-state="stem">
-      <p class="story-line">Потом появились ветви — каждая со своей историей.</p><div class="section-heading centered reveal"><span class="section-mark">02</span><h2>Что здесь<br><i>цветёт.</i></h2><p>Нажми на цветок. У каждого есть своя история.</p></div>
-      <div class="flower-grid"><button class="hobby-flower hobby-pink reveal" data-hobby="музыка" aria-label="Открыть увлечение: музыка"><span class="mini-flower">✿</span><strong>музыка</strong><small>саундтрек дня</small></button><button class="hobby-flower hobby-yellow reveal reveal-delay" data-hobby="рисование" aria-label="Открыть увлечение: рисование"><span class="mini-flower">✽</span><strong>рисование</strong><small>линии без плана</small></button><button class="hobby-flower hobby-lilac reveal reveal-delay-2" data-hobby="игры" aria-label="Открыть увлечение: игры"><span class="mini-flower">✾</span><strong>игры</strong><small>исследовать всё</small></button><button class="hobby-flower hobby-green reveal" data-hobby="книги" aria-label="Открыть увлечение: книги"><span class="mini-flower">❋</span><strong>книги</strong><small>ещё одна глава</small></button></div>
-      <div class="hobby-detail" aria-live="polite"><span>выбери растение, чтобы раскрыть заметку</span></div>
-      <div class="guest-sticker-field field-hobbies" data-sticker-field="hobbies" aria-label="Гостевая записка"></div>
-      <section class="owner-audio" data-owner-audio hidden aria-label="Музыкальная библиотека"><h3>Мои любимые треки</h3><div class="audio-owner-tools" data-audio-owner-tools hidden><label class="audio-upload">Добавить MP3<input type="file" accept="audio/mpeg,.mp3" multiple data-audio-files></label><p class="audio-hint">Загрузка и удаление доступны только владельцу после входа в модерацию.</p></div><div class="audio-list" data-audio-list></div><p class="audio-empty" data-audio-empty hidden>Библиотека пока пуста.</p></section>
-      <p class="steam-link" data-steam-link hidden><a href="#" target="_blank" rel="noopener noreferrer">Мой профиль Steam ↗</a></p>
+
+    <!-- On wide screens the bed is pinned and scrolls sideways; on small screens it is a swipeable row. -->
+    <section class="bed" id="bloom" aria-labelledby="bloom-title">
+      <div class="bed-pin">
+        <div class="bed-head">
+          <p class="hand-note" data-edit="bloom.note">полдень</p>
+          <h2 id="bloom-title" data-edit="bloom.title">Что здесь цветёт</h2>
+          <p data-edit="bloom.intro">Четыре грядки. Открой любую — внутри есть что посмотреть.</p>
+        </div>
+        <div class="bed-track" data-bed-track>
+          <article class="plot plot-music">
+            <span class="plot-glyph" aria-hidden="true">✿</span>
+            <h3 data-edit="bloom.music.title">музыка</h3>
+            <p data-edit="bloom.music.short">саундтрек дня</p>
+            <button class="plot-open" type="button" data-open-sheet="music" aria-haspopup="dialog"><span data-edit="bloom.open">открыть</span></button>
+          </article>
+          <article class="plot plot-draw">
+            <span class="plot-glyph" aria-hidden="true">✽</span>
+            <h3 data-edit="bloom.draw.title">рисование</h3>
+            <p data-edit="bloom.draw.short">линии без плана</p>
+            <button class="plot-open" type="button" data-open-sheet="draw" aria-haspopup="dialog"><span data-edit="bloom.open2">открыть</span></button>
+          </article>
+          <article class="plot plot-games">
+            <span class="plot-glyph" aria-hidden="true">✾</span>
+            <h3 data-edit="bloom.games.title">игры</h3>
+            <p data-edit="bloom.games.short">исследовать всё</p>
+            <button class="plot-open" type="button" data-open-sheet="games" aria-haspopup="dialog"><span data-edit="bloom.open3">открыть</span></button>
+          </article>
+          <article class="plot plot-books">
+            <span class="plot-glyph" aria-hidden="true">❋</span>
+            <h3 data-edit="bloom.books.title">книги</h3>
+            <p data-edit="bloom.books.short">ещё одна глава</p>
+            <button class="plot-open" type="button" data-open-sheet="books" aria-haspopup="dialog"><span data-edit="bloom.open4">открыть</span></button>
+          </article>
+        </div>
+        <div class="bed-rail" aria-hidden="true"><span></span></div>
+      </div>
     </section>
-    <section class="archive section-shell garden-chapter" id="notes" data-garden-state="afternoon" data-story-state="bloom"><p class="story-line">Некоторые мгновения хочется сохранить между страницами.</p><div class="archive-top reveal"><h2>Из гербария</h2><p>Листья, слова и вещи, которые хочется перечитать.</p></div><div class="archive-layout"><div class="archive-image reveal" data-parallax="soft"><img src="https://images.unsplash.com/photo-1494972308805-463bc619d34e?auto=format&fit=crop&w=1000&h=760&q=85" alt="Золотистые цветы в гербарии" loading="lazy"><span class="tape"></span></div><div class="notes-stack"><article class="note-card note-card-pink reveal"><span>01</span><p>Красивые идеи редко приходят по расписанию.</p><small>записано в 02:14</small></article><article class="note-card note-card-yellow reveal reveal-delay"><span>02</span><p>Сохранить: запах мокрого асфальта после первого дождя.</p><small>наблюдение</small></article><article class="note-card note-card-lilac reveal reveal-delay-2"><span>03</span><p>Сделать что-нибудь просто потому, что хочется.</p><small>из блокнота</small></article></div></div>
-      <div class="guest-sticker-field field-archive" data-sticker-field="archive" aria-label="Гостевая записка"></div>
+
+    <section class="herbarium" id="herbarium" aria-labelledby="herbarium-title">
+      <div class="herbarium-head">
+        <p class="hand-note" data-edit="herb.note">к вечеру</p>
+        <h2 id="herbarium-title" data-edit="herb.title">Гербарий</h2>
+        <p data-edit="herb.intro">Засушенные мысли, которые хочется перечитать. Нажми на листок, чтобы развернуть.</p>
+      </div>
+      <div class="pressed-grid">
+        <article class="pressed pressed-1" data-reveal>
+          <button class="pressed-toggle" type="button" aria-expanded="false"><span class="visually-hidden">Развернуть листок</span></button>
+          <div class="pressed-face pressed-front"><span class="pressed-glyph" aria-hidden="true">❦</span><h3 data-edit="herb.1.title">про идеи</h3></div>
+          <div class="pressed-face pressed-back"><p data-edit="herb.1.text" data-multiline>Красивые идеи редко приходят по расписанию.</p><small data-edit="herb.1.meta">записано в 02:14</small></div>
+        </article>
+        <article class="pressed pressed-2" data-reveal>
+          <button class="pressed-toggle" type="button" aria-expanded="false"><span class="visually-hidden">Развернуть листок</span></button>
+          <div class="pressed-face pressed-front"><span class="pressed-glyph" aria-hidden="true">✿</span><h3 data-edit="herb.2.title">про дождь</h3></div>
+          <div class="pressed-face pressed-back"><p data-edit="herb.2.text" data-multiline>Сохранить: запах мокрого асфальта после первого дождя.</p><small data-edit="herb.2.meta">наблюдение</small></div>
+        </article>
+        <article class="pressed pressed-3" data-reveal>
+          <button class="pressed-toggle" type="button" aria-expanded="false"><span class="visually-hidden">Развернуть листок</span></button>
+          <div class="pressed-face pressed-front"><span class="pressed-glyph" aria-hidden="true">✾</span><h3 data-edit="herb.3.title">про смелость</h3></div>
+          <div class="pressed-face pressed-back"><p data-edit="herb.3.text" data-multiline>Сделать что-нибудь просто потому, что хочется.</p><small data-edit="herb.3.meta">из блокнота</small></div>
+        </article>
+        <article class="pressed pressed-4" data-reveal>
+          <button class="pressed-toggle" type="button" aria-expanded="false"><span class="visually-hidden">Развернуть листок</span></button>
+          <div class="pressed-face pressed-front"><span class="pressed-glyph" aria-hidden="true">❀</span><h3 data-edit="herb.4.title">про медленность</h3></div>
+          <div class="pressed-face pressed-back"><p data-edit="herb.4.text" data-multiline>Цветы не торопятся — и всё равно успевают.</p><small data-edit="herb.4.meta">с подоконника</small></div>
+        </article>
+      </div>
+      <figure class="herbarium-photo" data-parallax>
+        <img data-image="herb.photo" src="https://images.unsplash.com/photo-1470509037663-253afd7f0f51?auto=format&fit=crop&w=1200&h=900&q=80" alt="Подсолнух в тёплом вечернем свете" width="1200" height="900" loading="lazy" decoding="async">
+        <span class="tape" aria-hidden="true"></span>
+      </figure>
     </section>
-    <section class="contact section-shell garden-chapter" id="contact" data-garden-state="sunset" data-story-state="garden">
-      <p class="story-line">Оставь свой след в саду.</p>
-      <div class="archive-top reveal"><h2>Оставь записку</h2><p>Напиши впечатление или пожелание. После проверки владельцем она появится на полях сада.</p></div>
-      <div class="sticker-actions">
-        <form class="sticker-submit" data-sticker-form>
-          <label for="sticker-text">Твоя записка</label>
-          <textarea id="sticker-text" name="text" rows="3" maxlength="180" placeholder="Оставь добрые слова..." required></textarea>
-          <button class="button button-primary" type="submit">отправить на проверку <span aria-hidden="true">↗</span></button>
-          <p class="sticker-status" data-sticker-status role="status" aria-live="polite"></p>
-        </form>
-        <details class="admin-panel">
-          <summary>Модерация владельца</summary>
-          <form class="admin-login" data-admin-login>
-            <label for="admin-password">Пароль администратора</label>
-            <input id="admin-password" type="password" autocomplete="current-password" required>
-            <button class="button button-quiet" type="submit">войти</button>
-            <button class="button button-quiet" type="button" data-admin-logout hidden>выйти</button>
-            <p class="admin-status" data-admin-status role="status" aria-live="polite"></p>
-          </form>
-          <div class="moderation-queue" data-moderation-queue></div>
-        </details>
+
+    <section class="dusk" id="dusk" aria-labelledby="dusk-title">
+      <div class="dusk-sky" aria-hidden="true"><span class="moon"></span><span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="star s4"></span><span class="star s5"></span><span class="firefly f1"></span><span class="firefly f2"></span><span class="firefly f3"></span></div>
+      <div class="dusk-copy">
+        <p class="hand-note" data-edit="dusk.note">21:30</p>
+        <h2 id="dusk-title" data-edit="dusk.title">Вечер в саду</h2>
+        <p data-edit="dusk.text" data-multiline>Солнце садится, но сад никуда не денется. Возвращайся — к тому времени здесь что-нибудь да расцветёт.</p>
+        <div class="dusk-links">
+          <a class="button button-night" data-link="steam" href="https://steamcommunity.com/id/flowertalkerr/" target="_blank" rel="noopener noreferrer"><span data-edit="dusk.steam">профиль в Steam</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+          <a class="button button-night-quiet" href="#top"><span data-edit="dusk.top">к рассвету</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V5M5.5 11.5 12 5l6.5 6.5"/></svg></a>
+        </div>
       </div>
     </section>
   </main>
-  <footer class="site-footer"><p>сделано flowertalker с терпением и водой</p><div><a href="#top">наверх ↑</a><span>© 2026 flowertalker</span></div></footer>
+
+  <footer class="site-footer">
+    <p data-edit="footer.text">сделано flowertalker с терпением и водой</p>
+    <p class="footer-meta"><span data-edit="footer.copy">© 2026 flowertalker</span><button class="gate" type="button" data-gate aria-label="Вход для садовника"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M4 12h16M6.3 6.3l11.4 11.4M17.7 6.3 6.3 17.7"/></svg></button></p>
+  </footer>
+
+  <dialog class="sheet" data-sheet aria-labelledby="sheet-title">
+    <div class="sheet-paper">
+      <button class="sheet-close" type="button" data-close-sheet aria-label="Закрыть"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <section class="sheet-page" data-sheet-page="music">
+        <span class="sheet-glyph" aria-hidden="true">✿</span>
+        <h2 data-edit="sheet.music.title">Музыка</h2>
+        <p data-edit="sheet.music.text" data-multiline>Музыка задаёт погоду внутри дня. Здесь треки, которые сейчас крутятся чаще всего.</p>
+        <div class="tracks" data-tracks></div>
+        <p class="tracks-empty" data-tracks-empty data-edit="sheet.music.empty">Пока тихо — треки скоро появятся.</p>
+      </section>
+      <section class="sheet-page" data-sheet-page="draw">
+        <span class="sheet-glyph" aria-hidden="true">✽</span>
+        <h2 data-edit="sheet.draw.title">Рисование</h2>
+        <p data-edit="sheet.draw.text" data-multiline>Рисование помогает думать руками. Лучшие линии появляются, когда не знаешь, что получится в конце.</p>
+      </section>
+      <section class="sheet-page" data-sheet-page="games">
+        <span class="sheet-glyph" aria-hidden="true">✾</span>
+        <h2 data-edit="sheet.games.title">Игры</h2>
+        <p data-edit="sheet.games.text" data-multiline>Люблю игры, в которых можно исследовать мир и случайно найти историю за углом: Phighting!, Deltarune и всё, где спрятаны секреты.</p>
+        <a class="button button-quiet" data-link="steam" href="https://steamcommunity.com/id/flowertalkerr/" target="_blank" rel="noopener noreferrer"><span data-edit="sheet.games.steam">профиль в Steam</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+      </section>
+      <section class="sheet-page" data-sheet-page="books">
+        <span class="sheet-glyph" aria-hidden="true">❋</span>
+        <h2 data-edit="sheet.books.title">Книги</h2>
+        <p data-edit="sheet.books.text" data-multiline>Книги — способ ненадолго поселиться в чужой голове и вернуться оттуда со свежими мыслями.</p>
+      </section>
+    </div>
+  </dialog>
+
   <div class="toast" role="status" aria-live="polite"></div>
-  <script src="script.js"></script>
 </body>
 </html>
